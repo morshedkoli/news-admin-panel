@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 // POST /api/users/[id]/sessions - Create user session
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { deviceInfo, ipAddress, userAgent } = body;
 
@@ -50,10 +50,10 @@ export async function POST(
 // GET /api/users/[id]/sessions - Get user sessions
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '20');
 
@@ -76,10 +76,10 @@ export async function GET(
 // DELETE /api/users/[id]/sessions - Delete all user sessions (logout from all devices)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.userSession.deleteMany({
       where: { userId: id }

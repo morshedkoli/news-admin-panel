@@ -70,9 +70,6 @@ export async function GET(request: Request) {
     const typePerformance = await prisma.notification.groupBy({
       by: ['type'],
       _count: { id: true },
-      _avg: {
-        // We'll calculate this from deliveries
-      },
       where: {
         createdAt: { gte: startDate }
       }

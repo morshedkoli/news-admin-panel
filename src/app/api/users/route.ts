@@ -131,15 +131,15 @@ export async function POST(request: NextRequest) {
         role,
         status,
         permissions,
-        emailVerified: new Date() // Auto-verify for admin created users
+        emailVerifiedAt: new Date() // Auto-verify for admin created users
       },
       include: {
         _count: {
           select: {
             createdNews: true,
             sentNotifications: true,
-            sessions: true,
-            activities: true
+            userSessions: true,
+            userActivities: true
           }
         }
       }

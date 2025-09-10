@@ -77,17 +77,17 @@ export async function POST(request: Request) {
     let tokens: any[] = []
 
     if (notification.targetType === 'all') {
-      tokens = await prisma.fcmToken.findMany({
+      tokens = await prisma.fCMToken.findMany({
         where: { isActive: true }
       })
     } else if (notification.targetType === 'category' && notification.targetValue) {
       // For category-based targeting, you might need to implement user preferences
-      tokens = await prisma.fcmToken.findMany({
+      tokens = await prisma.fCMToken.findMany({
         where: { isActive: true }
       })
     } else if (notification.targetType === 'specific' && notification.targetValue) {
       const tokenIds = notification.targetValue.split(',')
-      tokens = await prisma.fcmToken.findMany({
+      tokens = await prisma.fCMToken.findMany({
         where: {
           id: { in: tokenIds },
           isActive: true

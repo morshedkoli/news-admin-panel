@@ -28,14 +28,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if token already exists
-    const existingToken = await prisma.fcmToken.findUnique({
+    const existingToken = await prisma.fCMToken.findUnique({
       where: { deviceId }
     });
 
     let fcmToken;
     if (existingToken) {
       // Update existing token
-      fcmToken = await prisma.fcmToken.update({
+      fcmToken = await prisma.fCMToken.update({
         where: { deviceId },
         data: {
           token,
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // Create new token
-      fcmToken = await prisma.fcmToken.create({
+      fcmToken = await prisma.fCMToken.create({
         data: {
           token,
           platform,
@@ -56,15 +56,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Log API request
-    await prisma.apiRequest.create({
-      data: {
-        keyId: authResult.keyId!,
-        endpoint: '/api/v1/notifications/register',
-        method: 'POST',
-        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: request.headers.get('user-agent') || 'unknown'
-      }
-    });
+    if (authResult.keyId) {
+      await prisma.apiRequest.create({
+        data: {
+          keyId: authResult.keyId,
+          endpoint: '/api/v1/notifications/register',
+          method: 'POST',
+          ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+          userAgent: request.headers.get('user-agent') || 'unknown'
+        }
+      });
+    }
 
     return NextResponse.json({
       message: 'Device registered successfully',

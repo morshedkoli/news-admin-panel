@@ -20,15 +20,17 @@ export async function GET(request: NextRequest) {
     });
 
     // Log API request
-    await prisma.apiRequest.create({
-      data: {
-        keyId: authResult.keyId!,
-        endpoint: '/api/v1/categories',
-        method: 'GET',
-        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: request.headers.get('user-agent') || 'unknown'
-      }
-    });
+    if (authResult.keyId) {
+      await prisma.apiRequest.create({
+        data: {
+          keyId: authResult.keyId,
+          endpoint: '/api/v1/categories',
+          method: 'GET',
+          ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+          userAgent: request.headers.get('user-agent') || 'unknown'
+        }
+      });
+    }
 
     return NextResponse.json({
       data: categories.map(category => ({

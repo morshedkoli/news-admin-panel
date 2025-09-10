@@ -83,14 +83,12 @@ export async function POST() {
 
     // Insert analytics data
     await prisma.newsAnalytics.createMany({
-      data: analyticsData,
-      skipDuplicates: true
+      data: analyticsData
     })
 
     // Insert engagement data
     await prisma.userEngagement.createMany({
-      data: engagementData,
-      skipDuplicates: true
+      data: engagementData
     })
 
     // Update total counts in News table

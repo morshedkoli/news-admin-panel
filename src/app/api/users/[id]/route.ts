@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 // GET /api/users/[id] - Get single user
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const user = await prisma.user.findUnique({
       where: { id },
@@ -40,8 +40,7 @@ export async function GET(
             id: true,
             title: true,
             createdAt: true,
-            status: true,
-            deliveredCount: true
+            status: true
           },
           orderBy: { createdAt: 'desc' },
           take: 10
@@ -80,10 +79,10 @@ export async function GET(
 // PUT /api/users/[id] - Update user
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const {
       name,
@@ -145,8 +144,8 @@ export async function PUT(
           select: {
             createdNews: true,
             sentNotifications: true,
-            sessions: true,
-            activities: true
+            userSessions: true,
+            userActivities: true
           }
         }
       }
@@ -180,10 +179,10 @@ export async function PUT(
 // DELETE /api/users/[id] - Delete user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({

@@ -4,7 +4,7 @@ import { verifyApiKey, hasPermission } from '@/lib/api-auth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify API key
@@ -18,7 +18,7 @@ export async function GET(
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     const article = await prisma.news.findUnique({
       where: { 
@@ -47,15 +47,17 @@ export async function GET(
     });
 
     // Log API request
-    await prisma.apiRequest.create({
-      data: {
-        keyId: authResult.keyId!,
-        endpoint: `/api/v1/news/${id}`,
-        method: 'GET',
-        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: request.headers.get('user-agent') || 'unknown'
-      }
-    });
+    if (authResult.keyId) {
+      await prisma.apiRequest.create({
+        data: {
+          keyId: authResult.keyId,
+          endpoint: `/api/v1/news/${id}`,
+          method: 'GET',
+          ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+          userAgent: request.headers.get('user-agent') || 'unknown'
+        }
+      });
+    }
 
     return NextResponse.json({
       data: {

@@ -4,11 +4,11 @@ import { prisma } from '@/lib/prisma'
 export async function GET() {
   try {
     const [totalTokens, activeTokens, androidTokens, iosTokens, recentTokens] = await Promise.all([
-      prisma.fcmToken.count(),
-      prisma.fcmToken.count({ where: { isActive: true } }),
-      prisma.fcmToken.count({ where: { platform: 'android', isActive: true } }),
-      prisma.fcmToken.count({ where: { platform: 'ios', isActive: true } }),
-      prisma.fcmToken.findMany({
+      prisma.fCMToken.count(),
+      prisma.fCMToken.count({ where: { isActive: true } }),
+      prisma.fCMToken.count({ where: { platform: 'android', isActive: true } }),
+      prisma.fCMToken.count({ where: { platform: 'ios', isActive: true } }),
+      prisma.fCMToken.findMany({
         orderBy: { createdAt: 'desc' },
         take: 10,
         select: {
@@ -31,7 +31,7 @@ export async function GET() {
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    const dailyRegistrations = await prisma.fcmToken.groupBy({
+    const dailyRegistrations = await prisma.fCMToken.groupBy({
       by: ['createdAt'],
       _count: { id: true },
       where: {
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     }
 
     // Create or update FCM token
-    const fcmToken = await prisma.fcmToken.upsert({
+    const fcmToken = await prisma.fCMToken.upsert({
       where: { deviceId },
       update: {
         token,
