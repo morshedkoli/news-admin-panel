@@ -1,24 +1,36 @@
-import { prisma } from '@/lib/prisma'
+import { dbService } from '@/lib/db'
 import { DashboardStats } from '@/components/dashboard/stats'
 import { RecentNews } from '@/components/dashboard/recent-news'
 
 export default async function Dashboard() {
-  // Get dashboard statistics
+  // Get dashboard statistics using Firebase
   const [
-    totalNews,
-    publishedNews,
-    totalCategories,
-    recentNews
+    allNewsResult,
+    allCategories,
+    recentNewsResult
   ] = await Promise.all([
-    prisma.news.count(),
-    prisma.news.count({ where: { isPublished: true } }),
-    prisma.category.count(),
-    prisma.news.findMany({
-      take: 5,
-      orderBy: { createdAt: 'desc' },
-      include: { category: true }
-    })
+    dbService.getAllNews({ page: 1, limit: 10000 }), // Get all news for counting
+    dbService.getAllCategories(),
+    dbService.getAllNews({ page: 1, limit: 5 })
   ])
+
+  const totalNews = allNewsResult.total;
+  const publishedNews = allNewsResult.news.filter((news) => news.isPublished).length;
+  const totalCategories = allCategories.length;
+
+  // Combine news with category data
+  const recentNewsWithCategories = recentNewsResult.news.map((news) => {
+    const category = allCategories.find((cat) => cat.id === news.categoryId);
+    return {
+      id: news.id,
+      title: news.title,
+      isPublished: news.isPublished,
+      createdAt: news.createdAt,
+      category: {
+        name: category?.name || 'Uncategorized'
+      }
+    };
+  });
 
   const stats = {
     totalNews,
@@ -30,15 +42,15 @@ export default async function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">
+      <div className="bg-card rounded-lg shadow-sm p-6 border border-border">
+        <h1 className="text-3xl font-bold text-card-foreground">Dashboard</h1>
+        <p className="text-muted-foreground mt-2">
           Welcome to your news administration panel
         </p>
       </div>
 
       <DashboardStats stats={stats} />
-      <RecentNews news={recentNews} />
+      <RecentNews news={recentNewsWithCategories} />
     </div>
   )
 }

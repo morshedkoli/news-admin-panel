@@ -1,5 +1,7 @@
 'use client'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useRef, useState, useId } from 'react'
 import { Loader2 } from 'lucide-react'
 
@@ -13,7 +15,7 @@ interface QuillEditorProps {
 // Declare Quill type
 declare global {
   interface Window {
-    Quill: any
+    Quill: unknown
   }
 }
 
@@ -21,7 +23,7 @@ export function QuillEditor({ value, onChange, placeholder, className }: QuillEd
   const [isLoaded, setIsLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const editorRef = useRef<HTMLDivElement>(null)
-  const quillInstance = useRef<any>(null)
+  const quillInstance = useRef<unknown>(null)
   const editorId = useId()
   const isInitializing = useRef(false)
 
@@ -95,7 +97,7 @@ export function QuillEditor({ value, onChange, placeholder, className }: QuillEd
         ]
 
         // Create new Quill instance
-        quillInstance.current = new window.Quill(editorElement, {
+        quillInstance.current = new (window.Quill as new (element: HTMLElement, options: unknown) => unknown)(editorElement, {
           theme: 'snow',
           placeholder: placeholder || 'Write your content here...',
           modules: {
@@ -105,16 +107,16 @@ export function QuillEditor({ value, onChange, placeholder, className }: QuillEd
 
         // Set initial content
         if (value) {
-          quillInstance.current.root.innerHTML = value
+          (quillInstance.current as any).root.innerHTML = value
         }
 
         // Handle content changes with debouncing to prevent excessive updates
         let timeout: NodeJS.Timeout
-        quillInstance.current.on('text-change', () => {
+        ;(quillInstance.current as any).on('text-change', () => {
           clearTimeout(timeout)
           timeout = setTimeout(() => {
             if (quillInstance.current) {
-              const content = quillInstance.current.root.innerHTML
+              const content = (quillInstance.current as any).root.innerHTML
               onChange(content)
             }
           }, 300)
@@ -131,7 +133,7 @@ export function QuillEditor({ value, onChange, placeholder, className }: QuillEd
     return () => {
       if (quillInstance.current) {
         try {
-          quillInstance.current.off('text-change')
+          (quillInstance.current as any).off('text-change')
           // Don't clear the DOM in cleanup to prevent issues
         } catch (error) {
           console.log('Cleanup error:', error)
@@ -146,15 +148,15 @@ export function QuillEditor({ value, onChange, placeholder, className }: QuillEd
   useEffect(() => {
     if (quillInstance.current) {
       // Remove old listeners
-      quillInstance.current.off('text-change')
+      ;(quillInstance.current as any).off('text-change')
       
       // Add new listener with current onChange
       let timeout: NodeJS.Timeout
-      quillInstance.current.on('text-change', () => {
+      ;(quillInstance.current as any).on('text-change', () => {
         clearTimeout(timeout)
         timeout = setTimeout(() => {
           if (quillInstance.current) {
-            const content = quillInstance.current.root.innerHTML
+            const content = (quillInstance.current as any).root.innerHTML
             onChange(content)
           }
         }, 300)
@@ -164,11 +166,11 @@ export function QuillEditor({ value, onChange, placeholder, className }: QuillEd
 
   // Update content when value prop changes (without re-initializing editor)
   useEffect(() => {
-    if (quillInstance.current && value !== quillInstance.current.root.innerHTML) {
-      const currentSelection = quillInstance.current.getSelection()
-      quillInstance.current.root.innerHTML = value
+    if (quillInstance.current && value !== (quillInstance.current as any).root.innerHTML) {
+      const currentSelection = (quillInstance.current as any).getSelection()
+      ;(quillInstance.current as any).root.innerHTML = value
       if (currentSelection) {
-        quillInstance.current.setSelection(currentSelection)
+        ;(quillInstance.current as any).setSelection(currentSelection)
       }
     }
   }, [value])

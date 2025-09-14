@@ -1,16 +1,48 @@
-import { prisma } from '@/lib/prisma'
+'use client'
+
+import { useState, useEffect } from 'react'
 import { NewsForm } from '@/components/dashboard/news-form'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-export default async function CreateNewsPage() {
-  // Fetch all categories for the form
-  const categories = await prisma.category.findMany({
-    orderBy: {
-      name: 'asc'
+interface Category {
+  id: string
+  name: string
+  slug: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export default function CreateNewsPage() {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      console.log('Fetching categories...')
+      const response = await fetch('/api/categories')
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Categories fetched:', data)
+        setCategories(data)
+      } else {
+        console.error('Failed to fetch categories:', response.status)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    } finally {
+      setLoading(false)
     }
-  })
+  }
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="space-y-6">

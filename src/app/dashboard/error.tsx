@@ -36,7 +36,7 @@ export default function Error({
             We encountered an unexpected error while loading this page.
           </p>
           <p className="text-gray-500 text-sm">
-            Don't worry, this is usually temporary. Please try refreshing the page.
+            Don&apos;t worry, this is usually temporary. Please try refreshing the page.
           </p>
         </div>
 

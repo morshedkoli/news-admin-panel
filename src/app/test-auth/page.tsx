@@ -2,15 +2,33 @@
 
 import { useState } from 'react'
 import { signIn, getSession } from 'next-auth/react'
+import type { Session } from 'next-auth'
+
+interface CustomSession {
+  user?: {
+    id: string
+    email: string
+    name: string
+    role: string
+  }
+  expires: string
+}
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+interface SignInResult {
+  error?: string | null
+  status?: number
+  ok?: boolean
+  url?: string | null
+}
+
 export default function TestAuth() {
   const [email, setEmail] = useState('admin@newsapp.com')
   const [password, setPassword] = useState('NewsAdmin123!')
-  const [result, setResult] = useState<any>(null)
-  const [session, setSession] = useState<any>(null)
+  const [result, setResult] = useState<SignInResult | null>(null)
+  const [session, setSession] = useState<CustomSession | null>(null)
   const [loading, setLoading] = useState(false)
 
   const testSignIn = async () => {
@@ -28,17 +46,17 @@ export default function TestAuth() {
       })
 
       console.log('Sign-in result:', result)
-      setResult(result)
+      setResult(result || null)
 
       if (result?.ok) {
         // Get session after successful sign-in
         const sessionData = await getSession()
         console.log('Session data:', sessionData)
-        setSession(sessionData)
+        setSession(sessionData as CustomSession)
       }
     } catch (error) {
       console.error('Error:', error)
-      setResult({ error: 'Exception occurred', details: error })
+      setResult({ error: 'Exception occurred' })
     } finally {
       setLoading(false)
     }
@@ -48,7 +66,7 @@ export default function TestAuth() {
     try {
       const sessionData = await getSession()
       console.log('Current session:', sessionData)
-      setSession(sessionData)
+      setSession(sessionData as CustomSession)
     } catch (error) {
       console.error('Session error:', error)
     }

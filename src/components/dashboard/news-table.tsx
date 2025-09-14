@@ -15,7 +15,7 @@ interface News {
   createdAt: Date
   updatedAt: Date
   publishedAt: Date | null
-  category: {
+  category?: {
     id: string
     name: string
     slug: string
@@ -100,7 +100,7 @@ export function NewsTable({ news }: NewsTableProps) {
               </td>
               <td className="py-4 px-6">
                 <Badge variant="secondary">
-                  {article.category.name}
+                  {article.category?.name || 'Unknown Category'}
                 </Badge>
               </td>
               <td className="py-4 px-6">

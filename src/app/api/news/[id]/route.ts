@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { dbService } from '@/lib/db'
 import { messaging } from '@/lib/firebase-admin'
 
 // GET /api/news/[id] - Get single news article
@@ -11,18 +11,20 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const news = await prisma.news.findUnique({
-      where: { id },
-      include: {
-        category: true
-      }
-    })
+    const news = await dbService.getNewsById(id)
 
     if (!news) {
       return NextResponse.json({ error: 'News not found' }, { status: 404 })
     }
 
-    return NextResponse.json(news)
+    // Populate category information
+    const categoryData = await dbService.getCategoryById(news.categoryId)
+    const newsWithCategory = {
+      ...news,
+      category: categoryData || { id: news.categoryId, name: 'Unknown', slug: 'unknown' }
+    }
+
+    return NextResponse.json(newsWithCategory)
   } catch (error) {
     console.error('Error fetching news:', error)
     return NextResponse.json(
@@ -48,9 +50,7 @@ export async function PUT(
     const body = await request.json()
     const { title, content, imageUrl, categoryId, isPublished } = body
 
-    const existingNews = await prisma.news.findUnique({
-      where: { id }
-    })
+    const existingNews = await dbService.getNewsById(id)
 
     if (!existingNews) {
       return NextResponse.json({ error: 'News not found' }, { status: 404 })
@@ -59,27 +59,23 @@ export async function PUT(
     const wasUnpublished = !existingNews.isPublished
     const willBePublished = isPublished
 
-    const news = await prisma.news.update({
-      where: { id },
-      data: {
-        title,
-        content,
-        imageUrl,
-        categoryId,
-        isPublished,
-        publishedAt: willBePublished && wasUnpublished ? new Date() : existingNews.publishedAt
-      },
-      include: {
-        category: true
-      }
+    await dbService.updateNews(id, {
+      title,
+      content,
+      imageUrl,
+      categoryId,
+      isPublished,
+      publishedAt: willBePublished && wasUnpublished ? new Date() : existingNews.publishedAt
     })
+
+    const updatedNews = await dbService.getNewsById(id)
 
     // Send push notification if newly published
     if (wasUnpublished && willBePublished) {
-      await sendPushNotification(news)
+      await sendPushNotification(updatedNews!)
     }
 
-    return NextResponse.json(news)
+    return NextResponse.json(updatedNews)
   } catch (error) {
     console.error('Error updating news:', error)
     return NextResponse.json(
@@ -103,9 +99,7 @@ export async function DELETE(
 
     const { id } = await params
 
-    await prisma.news.delete({
-      where: { id }
-    })
+    await dbService.deleteNews(id)
 
     return NextResponse.json({ message: 'News deleted successfully' })
   } catch (error) {
@@ -117,12 +111,18 @@ export async function DELETE(
   }
 }
 
-async function sendPushNotification(news: any) {
+interface NotificationNews {
+  id: string
+  title: string
+  category?: {
+    name: string
+  }
+}
+
+async function sendPushNotification(news: NotificationNews) {
   try {
     // Get all FCM tokens
-    const tokens = await prisma.fCMToken.findMany({
-      select: { token: true }
-    })
+    const tokens = await dbService.getAllActiveFCMTokens()
 
     if (tokens.length === 0) return
 
@@ -134,7 +134,7 @@ async function sendPushNotification(news: any) {
       data: {
         newsId: news.id,
         title: news.title,
-        category: news.category.name
+        category: news.category?.name || 'General'
       },
       tokens: tokens.map((t: { token: string }) => t.token)
     }

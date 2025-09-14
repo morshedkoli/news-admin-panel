@@ -1,13 +1,6 @@
-import { PrismaClient } from '@prisma/client'
+// Firebase Database Service Export
+// This file provides compatibility for files that previously used Prisma
+import { dbService } from './db'
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
-
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: ['query'],
-  })
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+// Export the Firebase database service as 'prisma' for compatibility
+export const prisma = dbService

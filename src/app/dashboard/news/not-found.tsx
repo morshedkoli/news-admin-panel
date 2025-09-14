@@ -25,7 +25,7 @@ export default function NewsNotFound() {
         </h2>
         
         <p className="text-gray-600 mb-8 max-w-md mx-auto">
-          The news article you're looking for might have been deleted, moved, 
+          The news article you&apos;re looking for might have been deleted, moved, 
           or the URL might be incorrect.
         </p>
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { dbService } from '@/lib/db'
 import { messaging } from '@/lib/firebase-admin'
 
 // GET /api/news - Retrieve all news articles with filtering/pagination
@@ -12,50 +12,23 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const category = searchParams.get('category')
     const search = searchParams.get('search')
-    const published = searchParams.get('published')
 
-    const skip = (page - 1) * limit
+    const result = await dbService.getAllNews({ page, limit, category: category || undefined, search: search || undefined })
 
-    const where: any = {}
-    
-    if (category) {
-      where.categoryId = category
-    }
-    
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { content: { contains: search, mode: 'insensitive' } }
-      ]
-    }
-    
-    if (published !== null) {
-      where.isPublished = published === 'true'
-    }
-
-    const [news, total] = await Promise.all([
-      prisma.news.findMany({
-        where,
-        include: {
-          category: true
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        skip,
-        take: limit
-      }),
-      prisma.news.count({ where })
-    ])
+    // Populate category information for each news item
+    const newsWithCategories = await Promise.all(
+      result.news.map(async (newsItem) => {
+        const categoryData = await dbService.getCategoryById(newsItem.categoryId)
+        return {
+          ...newsItem,
+          category: categoryData || { id: newsItem.categoryId, name: 'Unknown', slug: 'unknown' }
+        }
+      })
+    )
 
     return NextResponse.json({
-      news,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit)
-      }
+      ...result,
+      news: newsWithCategories
     })
   } catch (error) {
     console.error('Error fetching news:', error)
@@ -85,18 +58,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const news = await prisma.news.create({
-      data: {
-        title,
-        content,
-        imageUrl,
-        categoryId,
-        isPublished: isPublished || false,
-        publishedAt: isPublished ? new Date() : null
-      },
-      include: {
-        category: true
-      }
+    const news = await dbService.createNews({
+      title,
+      content,
+      imageUrl,
+      categoryId,
+      isPublished: isPublished || false,
+      publishedAt: isPublished ? new Date() : undefined,
+      views: 0,
+      likes: 0,
+      shares: 0
     })
 
     // Send push notification if published
@@ -114,12 +85,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function sendPushNotification(news: any) {
+interface NotificationNews {
+  id: string
+  title: string
+  category?: {
+    name: string
+  }
+}
+
+async function sendPushNotification(news: NotificationNews) {
   try {
     // Get all FCM tokens
-    const tokens = await prisma.fCMToken.findMany({
-      select: { token: true }
-    })
+    const tokens = await dbService.getAllActiveFCMTokens()
 
     if (tokens.length === 0) return
 
@@ -131,7 +108,7 @@ async function sendPushNotification(news: any) {
       data: {
         newsId: news.id,
         title: news.title,
-        category: news.category.name
+        category: news.category?.name || 'General'
       },
       tokens: tokens.map((t: { token: string }) => t.token)
     }

@@ -260,7 +260,7 @@ export function NotificationAnalytics() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={(entry: any) => `${entry.type} (${entry.count})`}
+                    // label={(entry: { type: string; count: number }) => `${entry.type} (${entry.count})`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="count"

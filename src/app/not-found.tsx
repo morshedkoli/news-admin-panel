@@ -26,7 +26,7 @@ export default function GlobalNotFound() {
             Oops! Page Not Found
           </h1>
           <p className="text-gray-600 text-lg mb-2">
-            The page you're looking for doesn't exist.
+            The page you&apos;re looking for doesn&apos;t exist.
           </p>
           <p className="text-gray-500 text-sm">
             It might have been moved, deleted, or you entered the wrong URL.
@@ -51,7 +51,7 @@ export default function GlobalNotFound() {
             <strong>For administrators:</strong>
           </p>
           <p className="text-sm text-gray-500">
-            If you're trying to access the admin dashboard, please sign in first.
+            If you&apos;re trying to access the admin dashboard, please sign in first.
           </p>
         </div>
       </div>

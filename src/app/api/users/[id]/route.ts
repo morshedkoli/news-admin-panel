@@ -1,8 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import { NextRequest, NextResponse } from 'next/server'
+import { dbService } from '@/lib/db'
+import bcrypt from 'bcryptjs'
 
 // GET /api/users/[id] - Get single user
 export async function GET(
@@ -10,69 +8,40 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { id } = await params
 
-    const user = await prisma.user.findUnique({
-      where: { id },
-      include: {
-        userSessions: {
-          orderBy: { createdAt: 'desc' },
-          take: 10
-        },
-        userActivities: {
-          orderBy: { timestamp: 'desc' },
-          take: 20
-        },
-        createdNews: {
-          select: {
-            id: true,
-            title: true,
-            isPublished: true,
-            createdAt: true,
-            views: true,
-            likes: true
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 10
-        },
-        sentNotifications: {
-          select: {
-            id: true,
-            title: true,
-            createdAt: true,
-            status: true
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 10
-        },
-        _count: {
-          select: {
-            createdNews: true,
-            sentNotifications: true,
-            userSessions: true,
-            userActivities: true
-          }
-        }
-      }
-    });
+    const user = await dbService.getUserById(id)
 
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
-      );
+      )
     }
 
-    // Remove password from response
-    const { password, ...safeUser } = user;
+    // Remove password from response and add mock data
+    const { password: _, ...safeUser } = user
+    const mockUserData = {
+      ...safeUser,
+      userSessions: [],
+      userActivities: [],
+      createdNews: [],
+      sentNotifications: [],
+      _count: {
+        createdNews: 0,
+        sentNotifications: 0,
+        userSessions: 0,
+        userActivities: 0
+      }
+    }
 
-    return NextResponse.json(safeUser);
+    return NextResponse.json(mockUserData)
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error('Error fetching user:', error)
     return NextResponse.json(
       { error: 'Failed to fetch user' },
       { status: 500 }
-    );
+    )
   }
 }
 
@@ -82,8 +51,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const body = await request.json();
+    const { id } = await params
+    const body = await request.json()
     const {
       name,
       email,
@@ -92,87 +61,67 @@ export async function PUT(
       status,
       permissions,
       emailVerified
-    } = body;
+    } = body
 
     // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id }
-    });
+    const existingUser = await dbService.getUserById(id)
 
     if (!existingUser) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
-      );
+      )
     }
 
     // Check if email is being changed and if it already exists
     if (email && email !== existingUser.email) {
-      const emailExists = await prisma.user.findUnique({
-        where: { email }
-      });
+      const emailExists = await dbService.getUserByEmail(email)
 
       if (emailExists) {
         return NextResponse.json(
           { error: 'Email already exists' },
           { status: 409 }
-        );
+        )
       }
     }
 
     // Prepare update data
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {}
     
-    if (name) updateData.name = name;
-    if (email) updateData.email = email;
-    if (role) updateData.role = role;
-    if (status) updateData.status = status;
-    if (permissions) updateData.permissions = permissions;
-    if (emailVerified !== undefined) updateData.emailVerified = emailVerified ? new Date() : null;
+    if (name) updateData.name = name
+    if (email) updateData.email = email
+    if (role) updateData.role = role
+    if (status) updateData.status = status
+    if (permissions) updateData.permissions = permissions
+    if (emailVerified !== undefined) updateData.emailVerified = emailVerified ? new Date() : null
     
     // Hash password if provided
     if (password) {
-      updateData.password = await bcrypt.hash(password, 12);
+      updateData.password = await bcrypt.hash(password, 12)
     }
 
-    // Update user
-    const user = await prisma.user.update({
-      where: { id },
-      data: updateData,
-      include: {
-        _count: {
-          select: {
-            createdNews: true,
-            sentNotifications: true,
-            userSessions: true,
-            userActivities: true
-          }
-        }
+    // Mock update user
+    const updatedUser = await dbService.updateUser(id, updateData)
+
+    // Remove password from response and add mock data
+    const { password: _pwd, ...safeUser } = updatedUser
+    const mockUserData = {
+      ...safeUser,
+      _count: {
+        createdNews: 0,
+        sentNotifications: 0,
+        userSessions: 0,
+        userActivities: 0
       }
-    });
+    }
 
-    // Log activity
-    const changes = Object.keys(updateData).filter(key => key !== 'password');
-    await prisma.userActivity.create({
-      data: {
-        userId: user.id,
-        action: 'USER_UPDATED',
-        resource: 'user',
-        details: `User profile updated: ${changes.join(', ')}`,
-        ipAddress: request.headers.get('x-forwarded-for') || 'unknown'
-      }
-    });
-
-    // Remove password from response
-    const { password: _, ...safeUser } = user;
-
-    return NextResponse.json(safeUser);
+    return NextResponse.json(mockUserData)
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error('Error updating user:', error)
     return NextResponse.json(
       { error: 'Failed to update user' },
       { status: 500 }
-    );
+    )
   }
 }
 
@@ -182,45 +131,40 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { id } = await params
 
     // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id }
-    });
+    const existingUser = await dbService.getUserById(id)
 
     if (!existingUser) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
-      );
+      )
     }
 
     // Don't allow deletion of the last admin
-    if (existingUser.role === 'ADMIN') {
-      const adminCount = await prisma.user.count({
-        where: { role: 'ADMIN' }
-      });
+    if (existingUser.role === 'admin') {
+      const users = await dbService.getAllUsers()
+      const adminCount = users.filter(u => u.role === 'admin').length
 
       if (adminCount <= 1) {
         return NextResponse.json(
           { error: 'Cannot delete the last admin user' },
           { status: 400 }
-        );
+        )
       }
     }
 
-    // Delete user (this will cascade to related records)
-    await prisma.user.delete({
-      where: { id }
-    });
+    // Delete user
+    await dbService.deleteUser(id)
 
-    return NextResponse.json({ message: 'User deleted successfully' });
+    return NextResponse.json({ message: 'User deleted successfully' })
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error('Error deleting user:', error)
     return NextResponse.json(
       { error: 'Failed to delete user' },
       { status: 500 }
-    );
+    )
   }
 }

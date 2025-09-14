@@ -7,10 +7,34 @@ import { CheckCircle, AlertCircle, User, Mail, Lock } from 'lucide-react'
 
 export default function SetupPage() {
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{success: boolean; message: string; credentials?: { name: string; email: string; password: string }; warning?: string} | null>(null)
   const [error, setError] = useState('')
 
   const createAdminUser = async () => {
+    setLoading(true)
+    setError('')
+    setResult(null)
+    
+    try {
+      const response = await fetch('/api/setup/admin', {
+        method: 'POST',
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        setResult(data)
+      } else {
+        setError(data.message || 'Failed to create admin user')
+      }
+    } catch (err) {
+      setError('Failed to create admin user')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true)
     setError('')
     setResult(null)

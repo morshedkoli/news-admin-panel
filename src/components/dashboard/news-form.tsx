@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -45,6 +45,8 @@ const newsSchema = z.object({
 type NewsFormData = z.infer<typeof newsSchema>
 
 export function NewsForm({ categories, initialData }: NewsFormProps) {
+  console.log('NewsForm received categories:', categories)
+  
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imageUploading, setImageUploading] = useState(false)
@@ -71,6 +73,13 @@ export function NewsForm({ categories, initialData }: NewsFormProps) {
   } = form
 
   const watchedValues = watch()
+
+  // Set initial values for editing
+  useEffect(() => {
+    if (initialData?.categoryId) {
+      setValue('categoryId', initialData.categoryId)
+    }
+  }, [initialData?.categoryId, setValue])
 
   // Handle image upload
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -227,11 +236,14 @@ export function NewsForm({ categories, initialData }: NewsFormProps) {
               {/* Category Selection */}
               <div>
                 <Label htmlFor="categoryId">Category *</Label>
-                <Select onValueChange={(value: string) => setValue('categoryId', value)} defaultValue={initialData?.categoryId}>
+                <Select 
+                  onValueChange={(value: string) => setValue('categoryId', value)} 
+                  value={watchedValues.categoryId || ''}
+                >
                   <SelectTrigger className={errors.categoryId ? 'border-red-500 bg-white' : 'bg-white'}>
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                  <SelectContent className="bg-white border border-gray-200 shadow-lg max-h-60 overflow-y-auto">
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id} className="bg-white hover:bg-gray-50 text-gray-900">
                         {category.name}
@@ -241,6 +253,9 @@ export function NewsForm({ categories, initialData }: NewsFormProps) {
                 </Select>
                 {errors.categoryId && (
                   <p className="text-sm text-red-500 mt-1">{errors.categoryId.message}</p>
+                )}
+                {categories.length === 0 && (
+                  <p className="text-sm text-amber-600 mt-1">No categories available. Please create categories first.</p>
                 )}
               </div>
             </CardContent>

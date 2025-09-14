@@ -48,7 +48,7 @@ export default function GlobalError({
                 Application Error
               </h1>
               <p className="text-gray-600 text-lg mb-2">
-                We're experiencing technical difficulties.
+                            We&apos;re sorry, but something went wrong. This error has been reported to
               </p>
               <p className="text-gray-500 text-sm">
                 Our team has been notified and is working to resolve this issue.

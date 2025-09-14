@@ -244,7 +244,7 @@ export function UserForm({ user, onSubmit, onCancel, loading = false }: UserForm
                 <Label>Role</Label>
                 <Select 
                   value={watch('role')} 
-                  onValueChange={(value) => setValue('role', value as any)}
+                  onValueChange={(value) => setValue('role', value as 'ADMIN' | 'EDITOR' | 'VIEWER')}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select role" />
@@ -276,7 +276,7 @@ export function UserForm({ user, onSubmit, onCancel, loading = false }: UserForm
                 <Label>Status</Label>
                 <Select 
                   value={watch('status')} 
-                  onValueChange={(value) => setValue('status', value as any)}
+                  onValueChange={(value) => setValue('status', value as 'ACTIVE' | 'INACTIVE' | 'SUSPENDED')}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />

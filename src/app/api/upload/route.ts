@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
 import cloudinary from '@/lib/cloudinary'
+
+interface CloudinaryUploadResult {
+  secure_url: string
+  public_id: string
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +19,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes)
 
     // Upload to Cloudinary
-    const result = await new Promise((resolve, reject) => {
+    const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
           folder: 'news-app',
@@ -24,14 +27,14 @@ export async function POST(request: NextRequest) {
         },
         (error, result) => {
           if (error) reject(error)
-          else resolve(result)
+          else resolve(result as CloudinaryUploadResult)
         }
       ).end(buffer)
     })
 
     return NextResponse.json({ 
-      url: (result as any).secure_url,
-      publicId: (result as any).public_id
+      url: result.secure_url,
+      publicId: result.public_id
     })
   } catch (error) {
     console.error('Error uploading file:', error)

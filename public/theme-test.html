@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Persistence Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .light {
+            background-color: white;
+            color: black;
+        }
+        
+        .dark {
+            background-color: #1a1a1a;
+            color: white;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .dark .container {
+            border-color: #444;
+        }
+        
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        .info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+        }
+        
+        .dark .info {
+            background-color: #2d2d2d;
+            color: #e9ecef;
+        }
+        
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            display: inline-block;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .dark .success {
+            background-color: #155724;
+            color: #d4edda;
+        }
+    </style>
+</head>
+<body class="light">
+    <div class="container">
+        <h1>🎨 Theme Persistence Test</h1>
+        <p>This is a test page to verify theme persistence functionality similar to your News Admin Dashboard.</p>
+        
+        <div class="info">
+            <h3>Test Instructions:</h3>
+            <ol>
+                <li>Click "Toggle Theme" to switch between light and dark modes</li>
+                <li>Refresh the page to test persistence</li>
+                <li>Check the status information below</li>
+            </ol>
+        </div>
+        
+        <div>
+            <button onclick="toggleTheme()">Toggle Theme</button>
+            <button onclick="clearStorage()">Clear Storage</button>
+            <button onclick="location.reload()">Refresh Page</button>
+        </div>
+        
+        <div id="status" class="info">
+            <h4>Current Status:</h4>
+            <div id="currentTheme" class="status success">Theme: Loading...</div>
+            <div id="storageStatus" class="status success">Storage: Loading...</div>
+            <div id="domStatus" class="status success">DOM: Loading...</div>
+        </div>
+        
+        <div class="info">
+            <h4>Console Logs:</h4>
+            <div id="logs" style="font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; border-radius: 4px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Console logging override
+        const logsDiv = document.getElementById('logs');
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logsDiv.innerHTML += args.join(' ') + '<br>';
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        };
+        
+        // Theme persistence functions (similar to your app)
+        function applyTheme(theme) {
+            console.log('🎨 Applying theme:', theme);
+            
+            const body = document.body;
+            body.classList.remove('light', 'dark');
+            body.classList.add(theme);
+            body.setAttribute('data-theme', theme);
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem('theme', theme);
+                localStorage.setItem('appearanceSettings', JSON.stringify({
+                    theme: theme,
+                    primaryColor: '#007bff',
+                    enableDarkMode: theme === 'dark'
+                }));
+                console.log('✅ Theme saved to localStorage');
+            } catch (error) {
+                console.error('❌ Failed to save theme:', error);
+            }
+            
+            updateStatus();
+        }
+        
+        function loadTheme() {
+            console.log('📱 Loading theme from localStorage...');
+            
+            try {
+                let theme = localStorage.getItem('theme') || 'light';
+                const appearanceSettings = localStorage.getItem('appearanceSettings');
+                
+                if (appearanceSettings) {
+                    const settings = JSON.parse(appearanceSettings);
+                    theme = settings.theme || 'light';
+                    console.log('🔄 Theme from appearance settings:', theme);
+                } else {
+                    console.log('🔄 Theme from individual storage:', theme);
+                }
+                
+                applyThemeOnly(theme);
+                return theme;
+            } catch (error) {
+                console.error('❌ Error loading theme:', error);
+                applyThemeOnly('light');
+                return 'light';
+            }
+        }
+        
+        function applyThemeOnly(theme) {
+            console.log('🎨 Applying theme only (no save):', theme);
+            const body = document.body;
+            body.classList.remove('light', 'dark');
+            body.classList.add(theme);
+            body.setAttribute('data-theme', theme);
+            updateStatus();
+        }
+        
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            console.log('🔄 Toggling theme from', currentTheme, 'to', newTheme);
+            applyTheme(newTheme);
+        }
+        
+        function clearStorage() {
+            console.log('🗑️ Clearing localStorage...');
+            localStorage.removeItem('theme');
+            localStorage.removeItem('appearanceSettings');
+            applyTheme('light');
+        }
+        
+        function updateStatus() {
+            const theme = localStorage.getItem('theme') || 'not set';
+            const settings = localStorage.getItem('appearanceSettings') || 'not set';
+            const domTheme = document.body.getAttribute('data-theme') || 'not set';
+            const domClass = document.body.className || 'not set';
+            
+            document.getElementById('currentTheme').textContent = `Theme: ${theme}`;
+            document.getElementById('storageStatus').textContent = `Storage: ${settings !== 'not set' ? 'stored' : 'empty'}`;
+            document.getElementById('domStatus').textContent = `DOM: ${domClass} (data-theme: ${domTheme})`;
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded, initializing theme...');
+            loadTheme();
+        });
+        
+        // Listen for storage changes (for testing in multiple tabs)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'theme' || e.key === 'appearanceSettings') {
+                console.log('📡 Storage changed, reloading theme...');
+                loadTheme();
+            }
+        });
+    </script>
+</body>
+</html>

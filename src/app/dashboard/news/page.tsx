@@ -1,22 +1,75 @@
-import { prisma } from '@/lib/prisma'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { NewsTable } from '@/components/dashboard/news-table'
 import { CreateNewsButton } from '@/components/dashboard/create-news-button'
-import { Plus } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-export default async function NewsPage() {
-  // Fetch all news articles with categories
-  const news = await prisma.news.findMany({
-    include: {
-      category: true
-    },
-    orderBy: {
-      createdAt: 'desc'
+interface NewsWithCategory {
+  id: string
+  title: string
+  content: string
+  imageUrl: string | null
+  isPublished: boolean
+  createdAt: Date
+  updatedAt: Date
+  publishedAt: Date | null
+  category?: {
+    id: string
+    name: string
+    slug: string
+  }
+}
+
+export default function NewsPage() {
+  const [news, setNews] = useState<NewsWithCategory[]>([])
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    fetchNews()
+  }, [])
+
+  const fetchNews = async () => {
+    try {
+      const response = await fetch('/api/news')
+      if (response.ok) {
+        const data = await response.json()
+        setNews(data.news || [])
+      }
+    } catch (error) {
+      console.error('Error fetching news:', error)
+    } finally {
+      setLoading(false)
     }
-  })
+  }
+
+  const handleEdit = (id: string) => {
+    router.push(`/dashboard/news/edit/${id}`)
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/news/${id}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        setNews(news.filter(item => item.id !== id))
+      }
+    } catch (error) {
+      console.error('Error deleting news:', error)
+    }
+  }
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   // Get published and draft counts
-  const publishedCount = news.filter((item: any) => item.isPublished).length
-  const draftCount = news.filter((item: any) => !item.isPublished).length
+  const publishedCount = news.filter(item => item.isPublished).length
+  const draftCount = news.filter(item => !item.isPublished).length
 
   return (
     <div className="space-y-8">

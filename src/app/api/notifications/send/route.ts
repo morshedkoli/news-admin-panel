@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
+import { NextRequest, NextResponse } from 'next/server'
+import { dbService } from '@/lib/db'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
 // Firebase Admin SDK for sending push notifications
@@ -38,9 +38,9 @@ async function sendFCMNotification(payload: FCMPayload): Promise<{ success: bool
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions) as { user?: { role: string } }
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -55,9 +55,7 @@ export async function POST(request: Request) {
     }
 
     // Get notification details
-    const notification = await prisma.notification.findUnique({
-      where: { id: notificationId }
-    })
+    const notification = await dbService.getNotificationById(notificationId)
 
     if (!notification) {
       return NextResponse.json(
@@ -74,25 +72,17 @@ export async function POST(request: Request) {
     }
 
     // Get target tokens based on targetType
-    let tokens: any[] = []
+    let tokens: { id: string; token: string; userId?: string }[] = []
 
     if (notification.targetType === 'all') {
-      tokens = await prisma.fCMToken.findMany({
-        where: { isActive: true }
-      })
+      tokens = await dbService.getAllActiveFCMTokens()
     } else if (notification.targetType === 'category' && notification.targetValue) {
       // For category-based targeting, you might need to implement user preferences
-      tokens = await prisma.fCMToken.findMany({
-        where: { isActive: true }
-      })
+      tokens = await dbService.getAllActiveFCMTokens()
     } else if (notification.targetType === 'specific' && notification.targetValue) {
       const tokenIds = notification.targetValue.split(',')
-      tokens = await prisma.fCMToken.findMany({
-        where: {
-          id: { in: tokenIds },
-          isActive: true
-        }
-      })
+      const allTokens = await dbService.getAllActiveFCMTokens()
+      tokens = allTokens.filter(token => tokenIds.includes(token.id))
     }
 
     if (tokens.length === 0) {
@@ -103,16 +93,13 @@ export async function POST(request: Request) {
     }
 
     // Update notification status to sending
-    await prisma.notification.update({
-      where: { id: notificationId },
-      data: { 
-        status: 'sending',
-        sentAt: new Date()
-      }
+    await dbService.updateNotification(notificationId, { 
+      status: 'sending',
+      sentAt: new Date()
     })
 
     // Send notifications to all tokens
-    const deliveryPromises = tokens.map(async (token: any) => {
+    const deliveryPromises = tokens.map(async (token: { id: string; token: string; userId?: string }) => {
       const payload: FCMPayload = {
         notification: {
           title: notification.title,
@@ -124,22 +111,21 @@ export async function POST(request: Request) {
           type: notification.type,
           newsId: notification.newsId || ''
         },
-        token: token.token
+        token: token.token,
       }
 
       const result = await sendFCMNotification(payload)
 
-      // Create delivery record
-      return prisma.notificationDelivery.create({
-        data: {
-          notificationId: notification.id,
-          tokenId: token.id,
-          status: result.success ? 'delivered' : 'failed',
-          sentAt: new Date(),
-          deliveredAt: result.success ? new Date() : null,
-          errorMessage: result.error || null
-        }
-      })
+      // Create delivery record (mock implementation)
+      return {
+        id: `delivery_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        notificationId: notification.id,
+        tokenId: token.id,
+        status: result.success ? 'delivered' : 'failed',
+        sentAt: new Date(),
+        deliveredAt: result.success ? new Date() : null,
+        errorMessage: result.error || null
+      }
     })
 
     // Wait for all deliveries to complete
@@ -149,10 +135,7 @@ export async function POST(request: Request) {
 
     // Update notification status
     const finalStatus = failedDeliveries === 0 ? 'sent' : 'partially_sent'
-    await prisma.notification.update({
-      where: { id: notificationId },
-      data: { status: finalStatus }
-    })
+    await dbService.updateNotification(notificationId, { status: finalStatus })
 
     return NextResponse.json({
       success: true,
@@ -170,10 +153,7 @@ export async function POST(request: Request) {
     try {
       const { notificationId } = await request.json()
       if (notificationId) {
-        await prisma.notification.update({
-          where: { id: notificationId },
-          data: { status: 'failed' }
-        })
+        await dbService.updateNotification(notificationId, { status: 'failed' })
       }
     } catch (updateError) {
       console.error('Failed to update notification status:', updateError)

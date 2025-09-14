@@ -15,10 +15,10 @@ interface RecentNewsProps {
 
 export function RecentNews({ news }: RecentNewsProps) {
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-6 border-b border-gray-200">
+    <div className="bg-card rounded-lg shadow-sm border border-border">
+      <div className="p-6 border-b border-border">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Articles</h2>
+          <h2 className="text-lg font-semibold text-card-foreground">Recent Articles</h2>
           <Link href="/dashboard/news">
             <Button variant="outline" size="sm">
               View All
@@ -28,9 +28,9 @@ export function RecentNews({ news }: RecentNewsProps) {
       </div>
       <div className="p-6">
         {news.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">
+          <p className="text-muted-foreground text-center py-8">
             No articles yet. 
-            <Link href="/dashboard/news/create" className="text-blue-600 hover:underline ml-1">
+            <Link href="/dashboard/news/create" className="text-primary hover:underline ml-1">
               Create your first article
             </Link>
           </p>
@@ -39,17 +39,17 @@ export function RecentNews({ news }: RecentNewsProps) {
             {news.map((article) => (
               <div key={article.id} className="flex justify-between items-center py-2">
                 <div>
-                  <h3 className="font-medium text-gray-900">{article.title}</h3>
+                  <h3 className="font-medium text-card-foreground">{article.title}</h3>
                   <div className="flex items-center space-x-4 mt-1">
-                    <span className="text-sm text-gray-500">{article.category.name}</span>
+                    <span className="text-sm text-muted-foreground">{article.category.name}</span>
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       article.isPublished 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                     }`}>
                       {article.isPublished ? 'Published' : 'Draft'}
                     </span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       {new Date(article.createdAt).toLocaleDateString()}
                     </span>
                   </div>

@@ -1,21 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { dbService } from '@/lib/db'
 
 // GET /api/categories - Get all categories
 export async function GET() {
   try {
-    const categories = await prisma.category.findMany({
-      orderBy: {
-        name: 'asc'
-      },
-      include: {
-        _count: {
-          select: { news: true }
-        }
-      }
-    })
+    const categories = await dbService.getAllCategories()
 
     return NextResponse.json(categories)
   } catch (error) {
@@ -49,24 +40,14 @@ export async function POST(request: NextRequest) {
     // Create slug from name
     const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
-    const category = await prisma.category.create({
-      data: {
-        name,
-        slug
-      }
+    const category = await dbService.createCategory({
+      name,
+      slug
     })
 
     return NextResponse.json(category, { status: 201 })
   } catch (error) {
     console.error('Error creating category:', error)
-    
-    // Handle unique constraint violation
-    if (error instanceof Error && error.message.includes('Unique constraint')) {
-      return NextResponse.json(
-        { error: 'Category with this name already exists' },
-        { status: 409 }
-      )
-    }
     
     return NextResponse.json(
       { error: 'Failed to create category' },

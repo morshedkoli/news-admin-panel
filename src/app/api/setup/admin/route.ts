@@ -1,17 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextResponse } from 'next/server'
+import { dbService } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@newsapp.com'
     const adminPassword = process.env.ADMIN_PASSWORD || 'NewsAdmin123!'
     const adminName = process.env.ADMIN_NAME || 'News Administrator'
     
     // Check if admin user already exists
-    const existingAdmin = await prisma.user.findUnique({
-      where: { email: adminEmail }
-    })
+    const existingAdmin = await dbService.getUserByEmail(adminEmail)
     
     if (existingAdmin) {
       return NextResponse.json({
@@ -25,13 +23,16 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(adminPassword, 12)
     
     // Create admin user
-    const adminUser = await prisma.user.create({
-      data: {
-        email: adminEmail,
-        password: hashedPassword,
-        name: adminName,
-        role: 'ADMIN'
-      }
+    await dbService.createUser({
+      email: adminEmail,
+      password: hashedPassword,
+      name: adminName,
+      role: 'admin',
+      status: 'active',
+      permissions: ['*'],
+      loginCount: 0,
+      isEmailVerified: true,
+      twoFactorEnabled: false
     })
     
     return NextResponse.json({

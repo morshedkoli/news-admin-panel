@@ -1,37 +1,77 @@
-import { prisma } from '@/lib/prisma'
+'use client'
+
+import { useState, useEffect } from 'react'
 import { NewsForm } from '@/components/dashboard/news-form'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { useParams } from 'next/navigation'
 
-interface EditNewsPageProps {
-  params: {
-    id: string
-  }
+interface Category {
+  id: string
+  name: string
+  slug: string
+  createdAt: Date
+  updatedAt: Date
 }
 
-export default async function EditNewsPage({ params }: EditNewsPageProps) {
-  // Fetch the news article
-  const news = await prisma.news.findUnique({
-    where: {
-      id: params.id
-    },
-    include: {
-      category: true
-    }
-  })
+interface NewsData {
+  id: string
+  title: string
+  content: string
+  imageUrl?: string
+  categoryId: string
+  isPublished: boolean
+}
 
-  if (!news) {
-    notFound()
+export default function EditNewsPage() {
+  const params = useParams()
+  const [news, setNews] = useState<NewsData | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [notFoundError, setNotFoundError] = useState(false)
+
+  useEffect(() => {
+    if (params.id) {
+      fetchData()
+    }
+  }, [params.id])
+
+  const fetchData = async () => {
+    try {
+      const [newsResponse, categoriesResponse] = await Promise.all([
+        fetch(`/api/news/${params.id}`),
+        fetch('/api/categories')
+      ])
+
+      if (newsResponse.status === 404) {
+        setNotFoundError(true)
+        return
+      }
+
+      if (newsResponse.ok && categoriesResponse.ok) {
+        const [newsData, categoriesData] = await Promise.all([
+          newsResponse.json(),
+          categoriesResponse.json()
+        ])
+        setNews(newsData)
+        setCategories(categoriesData)
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // Fetch all categories for the form
-  const categories = await prisma.category.findMany({
-    orderBy: {
-      name: 'asc'
-    }
-  })
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (notFoundError || !news) {
+    notFound()
+  }
 
   const initialData = {
     id: news.id,

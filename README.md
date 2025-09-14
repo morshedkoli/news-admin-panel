@@ -1,10 +1,10 @@
 # News App Admin Dashboard
 
-A comprehensive admin dashboard for managing news articles with automatic push notifications. Built with Next.js, TypeScript, MongoDB, Prisma, and Firebase.
+A comprehensive admin dashboard for managing news articles with automatic push notifications. Built with Next.js, TypeScript, Firebase, and modern web technologies.
 
 ## Features
 
-- **Authentication**: Secure admin authentication using NextAuth.js
+- **Authentication**: Secure admin authentication using NextAuth.js (Firebase Auth migration planned)
 - **News Management**: Create, edit, delete, and publish/unpublish news articles
 - **Rich Text Editor**: Create engaging content with a rich text editor
 - **Image Upload**: Upload and manage featured images via Cloudinary
@@ -12,13 +12,14 @@ A comprehensive admin dashboard for managing news articles with automatic push n
 - **Push Notifications**: Automatic Firebase push notifications when articles are published
 - **Dashboard Analytics**: Overview of total articles, published articles, drafts, and categories
 - **Responsive Design**: Works seamlessly across desktop and mobile devices
+- **Real-time Database**: Firebase Firestore for instant data synchronization
 
 ## Tech Stack
 
 - **Frontend**: Next.js 15, TypeScript, Tailwind CSS
 - **Backend**: Next.js API Routes, Node.js
-- **Database**: MongoDB with Prisma ORM
-- **Authentication**: NextAuth.js
+- **Database**: Firebase Firestore (migrated from MongoDB)
+- **Authentication**: NextAuth.js (Firebase Auth planned)
 - **Push Notifications**: Firebase Cloud Messaging (FCM)
 - **Image Storage**: Cloudinary
 - **UI Components**: Radix UI primitives
@@ -28,7 +29,7 @@ A comprehensive admin dashboard for managing news articles with automatic push n
 Before running this application, make sure you have:
 
 - Node.js 18+ installed
-- MongoDB database (local or cloud)
+- Firebase project with Firestore enabled
 - Firebase project with FCM enabled
 - Cloudinary account for image uploads
 
@@ -37,22 +38,24 @@ Before running this application, make sure you have:
 Create a `.env` file in the root directory with the following variables:
 
 ```env
-# MongoDB Database URL
-DATABASE_URL="mongodb+srv://username:password@cluster0.mongodb.net/news_app_db?retryWrites=true&w=majority"
+# Firebase Configuration
+FIREBASE_PROJECT_ID="your-firebase-project-id"
+FIREBASE_PRIVATE_KEY="your-firebase-private-key"
+FIREBASE_CLIENT_EMAIL="your-firebase-client-email"
 
 # NextAuth.js Configuration
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-nextauth-secret-key-here"
 
-# Firebase Admin Configuration
-FIREBASE_PROJECT_ID="your-firebase-project-id"
-FIREBASE_PRIVATE_KEY="your-firebase-private-key"
-FIREBASE_CLIENT_EMAIL="your-firebase-client-email"
-
 # Cloudinary Configuration (for image uploads)
 CLOUDINARY_CLOUD_NAME="your-cloudinary-cloud-name"
 CLOUDINARY_API_KEY="your-cloudinary-api-key"
 CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
+
+# Default Admin Credentials
+ADMIN_EMAIL="admin@newsapp.com"
+ADMIN_PASSWORD="NewsAdmin123!"
+ADMIN_NAME="News Administrator"
 ```
 
 ## Installation
@@ -68,17 +71,14 @@ cd news-app-admin
 npm install
 ```
 
-3. Generate Prisma client:
-```bash
-npx prisma generate
-```
+3. Set up Firebase:
+   - Create a Firebase project at https://console.firebase.google.com
+   - Enable Firestore Database
+   - Enable Firebase Cloud Messaging (FCM)
+   - Generate service account credentials
+   - Add the credentials to your `.env` file
 
-4. Run database migrations (if using a fresh database):
-```bash
-npx prisma db push
-```
-
-5. Start the development server:
+4. Start the development server:
 ```bash
 npm run dev
 ```
@@ -112,17 +112,16 @@ npm run seed:admin
 
 ### Option 3: Manual Database Entry
 ```javascript
-// Connect to your MongoDB and run this script
-const bcrypt = require('bcryptjs');
+// Connect to Firebase Firestore and create admin user
+import { dbService } from './src/lib/db';
+import bcrypt from 'bcryptjs';
 
 const hashedPassword = await bcrypt.hash('NewsAdmin123!', 12);
-await db.users.insertOne({
+await dbService.createUser({
   email: 'admin@newsapp.com',
   password: hashedPassword,
   name: 'News Administrator',
-  role: 'ADMIN',
-  createdAt: new Date(),
-  updatedAt: new Date()
+  role: 'admin'
 });
 ```
 
@@ -146,23 +145,19 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Database Schema
 
-The application uses the following data models:
+The application uses Firebase Firestore with the following collections:
 
-### User
-- Admin user authentication and management
+### Collections
 
-### News
-- Title, content, featured image, category
-- Published status and timestamps
-- Relations to categories
+- **users**: Admin user accounts with roles and permissions
+- **news**: News articles with content, images, and metadata
+- **categories**: Article categories for organization
+- **fcm_tokens**: Device tokens for push notifications
+- **notifications**: Sent notification history
 
-### Category
-- News article categorization
-- Unique names and slugs
+### Firebase Security Rules
 
-### FCMToken
-- Device tokens for push notifications
-- Platform identification (Android/iOS)
+Make sure to configure Firestore security rules appropriately for your admin authentication.
 
 ## API Endpoints
 

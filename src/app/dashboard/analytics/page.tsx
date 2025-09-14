@@ -148,19 +148,19 @@ export default function Analytics() {
   if (loading) {
     return (
       <div className="space-y-8">
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-card rounded-lg shadow-sm p-6 border border-border">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-8 bg-muted rounded w-1/4"></div>
+            <div className="h-4 bg-muted rounded w-1/2"></div>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+            <div key={i} className="bg-card rounded-lg shadow-sm p-6 border border-border">
               <div className="animate-pulse space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-3 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-muted rounded w-3/4"></div>
+                <div className="h-8 bg-muted rounded w-1/2"></div>
+                <div className="h-3 bg-muted rounded w-full"></div>
               </div>
             </div>
           ))}
@@ -172,9 +172,9 @@ export default function Analytics() {
   if (!data) {
     return (
       <div className="space-y-8">
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-600 mt-2">Failed to load analytics data</p>
+        <div className="bg-card rounded-lg shadow-sm p-6 border border-border">
+          <h1 className="text-3xl font-bold text-card-foreground">Analytics</h1>
+          <p className="text-muted-foreground mt-2">Failed to load analytics data</p>
         </div>
       </div>
     )
@@ -183,21 +183,21 @@ export default function Analytics() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+      <div className="bg-card rounded-lg shadow-sm p-6 border border-border">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-3xl font-bold text-card-foreground">Analytics Dashboard</h1>
+            <p className="text-muted-foreground mt-2">
               Comprehensive insights into your news content performance
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Select value={period} onValueChange={setPeriod}>
-              <SelectTrigger className="w-32 bg-white">
+              <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200">
-                <SelectItem value="7" className="bg-white hover:bg-gray-50">Last 7 days</SelectItem>
+              <SelectContent>
+                <SelectItem value="7">Last 7 days</SelectItem>
                 <SelectItem value="14" className="bg-white hover:bg-gray-50">Last 14 days</SelectItem>
                 <SelectItem value="30" className="bg-white hover:bg-gray-50">Last 30 days</SelectItem>
                 <SelectItem value="90" className="bg-white hover:bg-gray-50">Last 90 days</SelectItem>

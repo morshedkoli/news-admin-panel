@@ -15,8 +15,7 @@ import {
   BarChart3,
   LogOut,
   Menu,
-  X,
-  Code
+  X
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -72,12 +71,6 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       active: pathname.startsWith('/dashboard/users')
     },
     {
-      href: '/dashboard/api',
-      label: 'API Management',
-      icon: Code,
-      active: pathname.startsWith('/dashboard/api')
-    },
-    {
       href: '/dashboard/settings',
       label: 'Settings',
       icon: Settings,
@@ -88,13 +81,13 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Newspaper className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <Newspaper className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-gray-900">News Admin</span>
+            <span className="text-xl font-bold text-foreground">News Admin</span>
           </div>
         )}
         <Button
@@ -127,13 +120,13 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
               className={cn(
                 'flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors group',
                 item.active
-                  ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-primary/10 text-primary border-r-2 border-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
               )}
             >
               <Icon className={cn(
                 'w-5 h-5 transition-colors',
-                item.active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+                item.active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
               )} />
               {!isCollapsed && <span>{item.label}</span>}
             </Link>
@@ -142,12 +135,12 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-border">
         {!isCollapsed && (
           <div className="mb-3">
-            <p className="text-sm font-medium text-gray-900">{user.name}</p>
-            <p className="text-xs text-gray-500">{user.email}</p>
-            <span className="inline-block px-2 py-1 mt-1 text-xs bg-green-100 text-green-800 rounded-full">
+            <p className="text-sm font-medium text-foreground">{user.name}</p>
+            <p className="text-xs text-muted-foreground">{user.email}</p>
+            <span className="inline-block px-2 py-1 mt-1 text-xs bg-accent text-accent-foreground rounded-full">
               {user.role}
             </span>
           </div>
@@ -183,7 +176,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           variant="outline"
           size="sm"
           onClick={() => setIsMobileOpen(true)}
-          className="bg-white shadow-md"
+          className="bg-background shadow-md"
         >
           <Menu className="w-4 h-4" />
         </Button>
@@ -191,7 +184,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
       {/* Desktop Sidebar */}
       <aside className={cn(
-        'hidden lg:flex lg:flex-col bg-white border-r border-gray-200 transition-all duration-300',
+        'hidden lg:flex lg:flex-col bg-background border-r border-border transition-all duration-300',
         isCollapsed ? 'w-16' : 'w-64'
       )}>
         <SidebarContent />
@@ -199,7 +192,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
       {/* Mobile Sidebar */}
       <aside className={cn(
-        'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 lg:hidden',
+        'fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-border transform transition-transform duration-300 lg:hidden',
         isMobileOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
         <SidebarContent />

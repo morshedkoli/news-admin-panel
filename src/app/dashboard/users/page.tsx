@@ -34,7 +34,7 @@ export default function UsersPage() {
     setShowForm(true);
   };
 
-  const handleFormSubmit = async (data: any) => {
+  const handleFormSubmit = async (data: { name: string; email: string; role: string; password?: string }) => {
     try {
       setFormLoading(true);
       
@@ -100,8 +100,8 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">User Management</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">User Management</h1>
+          <p className="text-muted-foreground mt-2">
             Manage user accounts, roles, and permissions
           </p>
         </div>
