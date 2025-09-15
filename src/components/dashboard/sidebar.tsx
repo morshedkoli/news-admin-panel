@@ -162,21 +162,13 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
   return (
     <>
-      {/* Mobile Overlay */}
-      {isMobileOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setIsMobileOpen(false)}
-        />
-      )}
-
       {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className="lg:hidden fixed top-4 left-4 z-[60]">
         <Button
           variant="outline"
           size="sm"
           onClick={() => setIsMobileOpen(true)}
-          className="bg-background shadow-md"
+          className="bg-background shadow-md border"
         >
           <Menu className="w-4 h-4" />
         </Button>
@@ -190,13 +182,21 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         <SidebarContent />
       </aside>
 
-      {/* Mobile Sidebar */}
-      <aside className={cn(
-        'fixed inset-y-0 left-0 z-50 w-64 bg-background border-r border-border transform transition-transform duration-300 lg:hidden',
-        isMobileOpen ? 'translate-x-0' : '-translate-x-full'
-      )}>
-        <SidebarContent />
-      </aside>
+      {/* Mobile Sidebar with Portal-like behavior */}
+      {isMobileOpen && (
+        <div className="lg:hidden">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-[45]"
+            onClick={() => setIsMobileOpen(false)}
+          />
+          
+          {/* Sidebar */}
+          <aside className="fixed inset-y-0 left-0 z-[50] w-64 bg-background border-r border-border shadow-xl">
+            <SidebarContent />
+          </aside>
+        </div>
+      )}
     </>
   )
 }
