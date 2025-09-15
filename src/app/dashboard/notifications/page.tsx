@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { NotificationForm } from '@/components/notifications/notification-form'
 import { NotificationsDashboard } from '@/components/notifications/notifications-dashboard'
 import { NotificationAnalytics } from '@/components/notifications/notification-analytics'
+import { NotificationTest } from '@/components/notifications/notification-test'
 import { 
   Send, 
   Bell, 
@@ -62,7 +63,7 @@ export default function Notifications() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
                 Dashboard
@@ -70,6 +71,10 @@ export default function Notifications() {
               <TabsTrigger value="analytics" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Analytics
+              </TabsTrigger>
+              <TabsTrigger value="test" className="flex items-center gap-2">
+                <Smartphone className="h-4 w-4" />
+                Test
               </TabsTrigger>
               <TabsTrigger value="create" className="flex items-center gap-2">
                 <Send className="h-4 w-4" />
@@ -85,6 +90,10 @@ export default function Notifications() {
 
             <TabsContent value="analytics" className="mt-0">
               <NotificationAnalytics />
+            </TabsContent>
+
+            <TabsContent value="test" className="mt-0">
+              <NotificationTest />
             </TabsContent>
 
             <TabsContent value="create" className="mt-0">

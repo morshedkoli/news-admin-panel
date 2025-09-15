@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { dbService } from '@/lib/db'
-import { messaging } from '@/lib/firebase-admin'
+import { pushNotificationService } from '@/lib/push-notification-service'
 
 // GET /api/news/[id] - Get single news article
 export async function GET(
@@ -72,7 +72,7 @@ export async function PUT(
 
     // Send push notification if newly published
     if (wasUnpublished && willBePublished) {
-      await sendPushNotification(updatedNews!)
+      await pushNotificationService.sendNewsNotification(id, updatedNews!.categoryId)
     }
 
     return NextResponse.json(updatedNews)
@@ -108,40 +108,5 @@ export async function DELETE(
       { error: 'Failed to delete news' },
       { status: 500 }
     )
-  }
-}
-
-interface NotificationNews {
-  id: string
-  title: string
-  category?: {
-    name: string
-  }
-}
-
-async function sendPushNotification(news: NotificationNews) {
-  try {
-    // Get all FCM tokens
-    const tokens = await dbService.getAllActiveFCMTokens()
-
-    if (tokens.length === 0) return
-
-    const message = {
-      notification: {
-        title: 'New News Article',
-        body: news.title
-      },
-      data: {
-        newsId: news.id,
-        title: news.title,
-        category: news.category?.name || 'General'
-      },
-      tokens: tokens.map((t: { token: string }) => t.token)
-    }
-
-    await messaging.sendEachForMulticast(message)
-    console.log('Push notification sent successfully')
-  } catch (error) {
-    console.error('Error sending push notification:', error)
   }
 }

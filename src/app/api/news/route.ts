@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { dbService } from '@/lib/db'
-import { messaging } from '@/lib/firebase-admin'
+import { pushNotificationService } from '@/lib/push-notification-service'
 
 // GET /api/news - Retrieve all news articles with filtering/pagination
 export async function GET(request: NextRequest) {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     // Send push notification if published
     if (isPublished) {
-      await sendPushNotification(news)
+      await pushNotificationService.sendNewsNotification(news.id, news.categoryId)
     }
 
     return NextResponse.json(news, { status: 201 })
@@ -82,40 +82,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to create news' },
       { status: 500 }
     )
-  }
-}
-
-interface NotificationNews {
-  id: string
-  title: string
-  category?: {
-    name: string
-  }
-}
-
-async function sendPushNotification(news: NotificationNews) {
-  try {
-    // Get all FCM tokens
-    const tokens = await dbService.getAllActiveFCMTokens()
-
-    if (tokens.length === 0) return
-
-    const message = {
-      notification: {
-        title: 'New News Article',
-        body: news.title
-      },
-      data: {
-        newsId: news.id,
-        title: news.title,
-        category: news.category?.name || 'General'
-      },
-      tokens: tokens.map((t: { token: string }) => t.token)
-    }
-
-    await messaging.sendEachForMulticast(message)
-    console.log('Push notification sent successfully')
-  } catch (error) {
-    console.error('Error sending push notification:', error)
   }
 }

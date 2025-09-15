@@ -3,6 +3,8 @@ import { dbService } from '@/lib/db'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
+import { messaging } from '@/lib/firebase-admin'
+
 // Firebase Admin SDK for sending push notifications
 interface FCMPayload {
   notification: {
@@ -16,24 +18,56 @@ interface FCMPayload {
   token: string
 }
 
-// Mock FCM service - Replace with actual Firebase Admin SDK
-async function sendFCMNotification(payload: FCMPayload): Promise<{ success: boolean; error?: string }> {
+// Real FCM service using Firebase Admin SDK
+async function sendFCMNotification(payload: FCMPayload): Promise<{ success: boolean; error?: string; messageId?: string }> {
   try {
-    // This is a mock implementation
-    // In production, use Firebase Admin SDK:
-    // const response = await admin.messaging().send(payload)
-    
-    console.log('Sending FCM notification:', payload)
-    
-    // Simulate success/failure
-    const isSuccess = Math.random() > 0.1 // 90% success rate
-    
-    if (isSuccess) {
-      return { success: true }
-    } else {
-      return { success: false, error: 'FCM delivery failed' }
+    const message = {
+      notification: payload.notification,
+      data: payload.data || {},
+      token: payload.token,
+      android: {
+        notification: {
+          icon: 'ic_notification',
+          color: '#3b82f6',
+          sound: 'default',
+          channelId: 'news_updates'
+        },
+        priority: 'high' as const
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'default',
+            badge: 1,
+            alert: {
+              title: payload.notification.title,
+              body: payload.notification.body
+            }
+          }
+        }
+      }
     }
+    
+    const response = await messaging.send(message)
+    console.log('FCM notification sent successfully:', response)
+    
+    return { success: true, messageId: response }
   } catch (error) {
+    console.error('FCM notification failed:', error)
+    
+    // Handle specific FCM errors
+    if (error instanceof Error) {
+      if (error.message.includes('registration-token-not-registered')) {
+        return { success: false, error: 'Token no longer valid' }
+      }
+      if (error.message.includes('invalid-registration-token')) {
+        return { success: false, error: 'Invalid token format' }
+      }
+      if (error.message.includes('message-rate-exceeded')) {
+        return { success: false, error: 'Rate limit exceeded' }
+      }
+    }
+    
     return { success: false, error: (error as Error).message }
   }
 }
