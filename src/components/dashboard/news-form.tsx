@@ -107,24 +107,20 @@ export function NewsForm({ categories, initialData }: NewsFormProps) {
     setImageUploading(true)
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('upload_preset', 'news-app')
 
     try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: 'POST',
-          body: formData
-        }
-      )
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
 
       if (!response.ok) {
         throw new Error('Upload failed')
       }
 
       const data = await response.json()
-      setValue('imageUrl', data.secure_url)
-      setImagePreview(data.secure_url)
+      setValue('imageUrl', data.url)
+      setImagePreview(data.url)
       
       toast({
         title: 'Image uploaded successfully',

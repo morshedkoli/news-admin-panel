@@ -43,10 +43,9 @@ export function FileUpload({
       // Create FormData for file upload
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', 'newsapp_uploads'); // You'll need to set this up in Cloudinary
 
-      // Upload to Cloudinary
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      // Upload via API route
+      const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
@@ -56,7 +55,7 @@ export function FileUpload({
       }
 
       const data = await response.json();
-      const uploadedUrl = data.secure_url;
+      const uploadedUrl = data.url;
       
       setUrlInput(uploadedUrl);
       onUpload(uploadedUrl);
