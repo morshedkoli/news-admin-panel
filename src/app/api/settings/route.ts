@@ -23,7 +23,7 @@ export async function GET() {
 }
 
 // POST /api/settings - Save application settings
-export async function PUT(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions) as { user?: { role: string } }
     if (!session?.user) {

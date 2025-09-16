@@ -64,10 +64,18 @@ export function NotificationAnalytics() {
   const fetchAnalytics = async () => {
     try {
       const response = await fetch(`/api/notifications/analytics?days=${period}`)
-      if (response.ok) {
-        const data = await response.json()
-        setAnalytics(data)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+      
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server did not return JSON')
+      }
+      
+      const data = await response.json()
+      setAnalytics(data)
     } catch (error) {
       console.error('Failed to fetch notification analytics:', error)
     } finally {
@@ -83,8 +91,8 @@ export function NotificationAnalytics() {
             <Card key={i}>
               <CardContent className="p-6">
                 <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-8 bg-muted rounded w-1/2"></div>
                 </div>
               </CardContent>
             </Card>
@@ -98,7 +106,7 @@ export function NotificationAnalytics() {
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-center text-gray-500">Failed to load analytics data</p>
+          <p className="text-center text-muted-foreground">Failed to load analytics data</p>
         </CardContent>
       </Card>
     )
@@ -113,15 +121,15 @@ export function NotificationAnalytics() {
     <div className="space-y-6">
       {/* Period Selector */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Notification Analytics</h2>
+        <h2 className="text-2xl font-bold text-foreground">Notification Analytics</h2>
         <Select value={period} onValueChange={setPeriod}>
-          <SelectTrigger className="w-40 bg-white">
+          <SelectTrigger className="w-40">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-gray-200">
-            <SelectItem value="7" className="bg-white hover:bg-gray-50">Last 7 days</SelectItem>
-            <SelectItem value="30" className="bg-white hover:bg-gray-50">Last 30 days</SelectItem>
-            <SelectItem value="90" className="bg-white hover:bg-gray-50">Last 90 days</SelectItem>
+          <SelectContent>
+            <SelectItem value="7">Last 7 days</SelectItem>
+            <SelectItem value="30">Last 30 days</SelectItem>
+            <SelectItem value="90">Last 90 days</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -132,9 +140,9 @@ export function NotificationAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Sent</p>
-                <p className="text-2xl font-bold">{analytics.overview.totalDeliveries.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-medium text-muted-foreground">Total Sent</p>
+                <p className="text-2xl font-bold text-foreground">{analytics.overview.totalDeliveries.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground mt-1">
                   {analytics.overview.sentNotifications} notifications
                 </p>
               </div>
@@ -147,9 +155,9 @@ export function NotificationAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Delivery Rate</p>
-                <p className="text-2xl font-bold">{analytics.overview.deliveryRate}%</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-medium text-muted-foreground">Delivery Rate</p>
+                <p className="text-2xl font-bold text-foreground">{analytics.overview.deliveryRate}%</p>
+                <p className="text-xs text-muted-foreground mt-1">
                   {analytics.overview.successfulDeliveries.toLocaleString()} delivered
                 </p>
               </div>
@@ -162,9 +170,9 @@ export function NotificationAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Click Rate</p>
-                <p className="text-2xl font-bold">{analytics.overview.clickRate}%</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-medium text-muted-foreground">Click Rate</p>
+                <p className="text-2xl font-bold text-foreground">{analytics.overview.clickRate}%</p>
+                <p className="text-xs text-muted-foreground mt-1">
                   {analytics.overview.clickedDeliveries.toLocaleString()} clicks
                 </p>
               </div>
@@ -177,9 +185,9 @@ export function NotificationAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Scheduled</p>
-                <p className="text-2xl font-bold">{analytics.overview.scheduledNotifications}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-medium text-muted-foreground">Scheduled</p>
+                <p className="text-2xl font-bold text-foreground">{analytics.overview.scheduledNotifications}</p>
+                <p className="text-xs text-muted-foreground mt-1">
                   Pending notifications
                 </p>
               </div>

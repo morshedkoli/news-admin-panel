@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { toast } from '@/components/ui/use-toast'
 import { Edit, Trash2, Plus, Loader2, FolderOpen } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -101,13 +102,25 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
       })
 
       if (response.ok) {
+        toast({
+          title: 'Success',
+          description: 'Category deleted successfully'
+        })
         router.refresh()
       } else {
         const data = await response.json()
-        alert(data.error || 'Failed to delete category')
+        toast({
+          title: 'Error',
+          description: data.error || 'Failed to delete category',
+          variant: 'destructive'
+        })
       }
     } catch (error) {
-      alert('An unexpected error occurred')
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred',
+        variant: 'destructive'
+      })
     } finally {
       setDeleteLoading(null)
     }
@@ -116,11 +129,11 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
   if (categories.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <FolderOpen className="w-8 h-8 text-gray-400" />
+        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+          <FolderOpen className="w-8 h-8 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No categories yet</h3>
-        <p className="text-gray-500 mb-4">Get started by creating your first category to organize your news articles.</p>
+        <h3 className="text-lg font-medium text-foreground mb-2">No categories yet</h3>
+        <p className="text-muted-foreground mb-4">Get started by creating your first category to organize your news articles.</p>
       </div>
     )
   }
@@ -128,18 +141,18 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b bg-muted/50">
           <tr>
-            <th className="text-left py-3 px-6 font-medium text-gray-900">Name</th>
-            <th className="text-left py-3 px-6 font-medium text-gray-900">Slug</th>
-            <th className="text-left py-3 px-6 font-medium text-gray-900">Articles</th>
-            <th className="text-left py-3 px-6 font-medium text-gray-900">Created</th>
-            <th className="text-left py-3 px-6 font-medium text-gray-900">Actions</th>
+            <th className="text-left py-3 px-6 font-medium text-foreground">Name</th>
+            <th className="text-left py-3 px-6 font-medium text-foreground">Slug</th>
+            <th className="text-left py-3 px-6 font-medium text-foreground">Articles</th>
+            <th className="text-left py-3 px-6 font-medium text-foreground">Created</th>
+            <th className="text-left py-3 px-6 font-medium text-foreground">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-border">
           {categories.map((category) => (
-            <tr key={category.id} className="hover:bg-gray-50">
+            <tr key={category.id} className="hover:bg-muted/50">
               <td className="py-4 px-6">
                 {editingId === category.id ? (
                   <div className="space-y-2">
@@ -155,15 +168,15 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
                   </div>
                 ) : (
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FolderOpen className="w-4 h-4 text-purple-600" />
+                    <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FolderOpen className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <span className="font-medium text-gray-900">{category.name}</span>
+                    <span className="font-medium text-foreground">{category.name}</span>
                   </div>
                 )}
               </td>
               <td className="py-4 px-6">
-                <code className="text-sm bg-gray-100 px-2 py-1 rounded">
+                <code className="text-sm bg-muted px-2 py-1 rounded">
                   {category.slug}
                 </code>
               </td>
@@ -172,7 +185,7 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
                   {category._count.news} {category._count.news === 1 ? 'article' : 'articles'}
                 </Badge>
               </td>
-              <td className="py-4 px-6 text-sm text-gray-500">
+              <td className="py-4 px-6 text-sm text-muted-foreground">
                 {formatDate(category.createdAt)}
               </td>
               <td className="py-4 px-6">

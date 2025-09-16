@@ -250,30 +250,28 @@ export function AppearanceProvider({ children }: { children: React.ReactNode }) 
         console.log('Loaded appearance settings from localStorage:', localSettings);
         setAppearance(localSettings);
         // Theme should already be applied by the initial script, so don't reapply
-        return localSettings;
       }
       
-      // Then try to load from API to sync with server
+      // Try to load from server API
       try {
         const response = await fetch('/api/settings');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.appearance) {
-            console.log('Loaded appearance settings from server:', data.appearance);
-            setAppearance(data.appearance);
-            
-            // Only apply settings that might not be handled by the initial script
-            if (data.appearance.customCSS) {
-              applyCustomCSS(data.appearance.customCSS);
-            }
-            if (data.appearance.faviconUrl) {
-              applyFavicon(data.appearance.faviconUrl);
-            }
-            
-            // Update localStorage with server data
-            localStorage.setItem('appearanceSettings', JSON.stringify(data.appearance));
-            return data.appearance;
-          }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Server did not return JSON');
+        }
+        
+        const data = await response.json();
+        if (data.appearance) {
+          console.log('Loaded appearance settings from server:', data.appearance);
+          setAppearance(data.appearance);
+          // Update localStorage with server data
+          localStorage.setItem('appearanceSettings', JSON.stringify(data.appearance));
+          return data.appearance;
         }
       } catch (apiError) {
         console.warn('Failed to load settings from API, using localStorage only:', apiError);

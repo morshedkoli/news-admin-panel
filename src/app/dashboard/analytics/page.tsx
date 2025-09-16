@@ -198,9 +198,9 @@ export default function Analytics() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="7">Last 7 days</SelectItem>
-                <SelectItem value="14" className="bg-white hover:bg-gray-50">Last 14 days</SelectItem>
-                <SelectItem value="30" className="bg-white hover:bg-gray-50">Last 30 days</SelectItem>
-                <SelectItem value="90" className="bg-white hover:bg-gray-50">Last 90 days</SelectItem>
+                <SelectItem value="14">Last 14 days</SelectItem>
+                <SelectItem value="30">Last 30 days</SelectItem>
+                <SelectItem value="90">Last 90 days</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -208,12 +208,11 @@ export default function Analytics() {
               disabled={refreshing}
               variant="outline"
               size="sm"
-              className="bg-white"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button onClick={exportData} variant="outline" size="sm" className="bg-white">
+            <Button onClick={exportData} variant="outline" size="sm">
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
@@ -296,10 +295,10 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-blue-900">Average Views per Article</span>
-                  <Badge className="bg-blue-100 text-blue-800">
+                  <span className="text-sm font-medium text-blue-900 dark:text-blue-100">Average Views per Article</span>
+                  <Badge className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">
                     {data.overview.publishedNews > 0 
                       ? Math.round(data.overview.totalViews / data.overview.publishedNews)
                       : 0

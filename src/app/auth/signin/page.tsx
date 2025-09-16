@@ -88,22 +88,22 @@ export default function SignIn() {
       </div>
 
       {/* Right side - Login form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-50">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-background">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center justify-center mb-8">
             <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-3">
               <Newspaper className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">News Admin</span>
+            <span className="text-2xl font-bold text-foreground">News Admin</span>
           </div>
 
-          <div className="bg-white shadow-xl rounded-2xl p-8">
+          <div className="bg-card shadow-xl rounded-2xl p-8">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-card-foreground mb-2">
                 Welcome back
               </h2>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Sign in to your admin account
               </p>
             </div>
@@ -111,11 +111,11 @@ export default function SignIn() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="email" className="text-sm font-medium text-card-foreground">
                     Email address
                   </Label>
                   <div className="relative mt-1">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                     <Input
                       id="email"
                       name="email"
@@ -124,17 +124,17 @@ export default function SignIn() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="admin@example.com"
-                      className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="pl-10 h-12"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="password" className="text-sm font-medium text-card-foreground">
                     Password
                   </Label>
                   <div className="relative mt-1">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                     <Input
                       id="password"
                       name="password"
@@ -143,12 +143,12 @@ export default function SignIn() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="pl-10 pr-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="pl-10 pr-10 h-12"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -195,14 +195,14 @@ export default function SignIn() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Protected by enterprise-grade security
               </p>
             </div>
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Need help? Contact your system administrator
             </p>
           </div>

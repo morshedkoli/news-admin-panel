@@ -64,10 +64,18 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/categories')
-      if (response.ok) {
-        const data = await response.json()
-        setCategories(data)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+      
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server did not return JSON')
+      }
+      
+      const data = await response.json()
+      setCategories(data)
     } catch (error) {
       console.error('Failed to fetch categories:', error)
     }
@@ -76,10 +84,18 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
   const fetchNewsArticles = async () => {
     try {
       const response = await fetch('/api/news?limit=50')
-      if (response.ok) {
-        const data = await response.json()
-        setNewsArticles(data.news || [])
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+      
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server did not return JSON')
+      }
+      
+      const data = await response.json()
+      setNewsArticles(data.news || [])
     } catch (error) {
       console.error('Failed to fetch news articles:', error)
     }

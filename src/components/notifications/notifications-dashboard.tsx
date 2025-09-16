@@ -80,11 +80,19 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
       })
 
       const response = await fetch(`/api/notifications?${params}`)
-      if (response.ok) {
-        const data = await response.json()
-        setNotifications(data.notifications)
-        setTotalPages(data.pagination.pages)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+      
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server did not return JSON')
+      }
+      
+      const data = await response.json()
+      setNotifications(data.notifications)
+      setTotalPages(data.pagination.pages)
     } catch (error) {
       console.error('Failed to fetch notifications:', error)
       toast({

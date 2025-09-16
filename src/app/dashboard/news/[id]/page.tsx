@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { toast } from '@/components/ui/use-toast'
 import { ArrowLeft, Edit, Calendar, Eye, ThumbsUp, Share2 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -93,7 +94,7 @@ export default function NewsViewPage() {
   if (error || !news) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-card rounded-lg shadow-sm p-6 border">
           <div className="flex items-center space-x-4">
             <Button variant="outline" size="sm" onClick={() => router.back()}>
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -114,7 +115,7 @@ export default function NewsViewPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+      <div className="bg-card rounded-lg shadow-sm p-6 border">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard/news">
@@ -124,10 +125,8 @@ export default function NewsViewPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">View Article</h1>
-              <p className="text-gray-600 mt-2">
-                Review and manage this news article
-              </p>
+              <h1 className="text-3xl font-bold text-card-foreground">View Article</h1>
+              <p className="text-muted-foreground mt-1">Review and manage this article</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -294,7 +293,10 @@ export default function NewsViewPage() {
                     })
                   } else {
                     navigator.clipboard.writeText(window.location.href)
-                    alert('Link copied to clipboard!')
+                    toast({
+                      title: 'Success',
+                      description: 'Link copied to clipboard!'
+                    })
                   }
                 }}
               >

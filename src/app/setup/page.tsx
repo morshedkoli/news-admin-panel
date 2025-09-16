@@ -59,7 +59,7 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -74,7 +74,7 @@ export default function SetupPage() {
         <CardContent className="space-y-6">
           {!result && !error && (
             <div className="text-center">
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 Click the button below to create the default admin user for your News Dashboard.
               </p>
               <Button 
@@ -106,30 +106,30 @@ export default function SetupPage() {
                 </h3>
                 
                 {result.credentials && (
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-3 text-left">
-                    <h4 className="font-medium text-gray-900">Login Credentials:</h4>
+                  <div className="bg-muted rounded-lg p-4 space-y-3 text-left">
+                    <h4 className="font-medium text-foreground">Login Credentials:</h4>
                     
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">Email:</span>
-                        <code className="text-sm bg-white px-2 py-1 rounded border">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Email:</span>
+                        <code className="text-sm bg-background px-2 py-1 rounded border">
                           {result.credentials.email}
                         </code>
                       </div>
                       
                       <div className="flex items-center space-x-2">
-                        <Lock className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">Password:</span>
-                        <code className="text-sm bg-white px-2 py-1 rounded border">
+                        <Lock className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Password:</span>
+                        <code className="text-sm bg-background px-2 py-1 rounded border">
                           {result.credentials.password}
                         </code>
                       </div>
                       
                       <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">Name:</span>
-                        <code className="text-sm bg-white px-2 py-1 rounded border">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Name:</span>
+                        <code className="text-sm bg-background px-2 py-1 rounded border">
                           {result.credentials.name}
                         </code>
                       </div>

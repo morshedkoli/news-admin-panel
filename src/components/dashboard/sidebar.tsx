@@ -168,7 +168,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           variant="outline"
           size="sm"
           onClick={() => setIsMobileOpen(true)}
-          className="bg-background shadow-md border"
+          className="bg-background/95 backdrop-blur-sm shadow-lg border border-border"
         >
           <Menu className="w-4 h-4" />
         </Button>
@@ -187,12 +187,12 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         <div className="lg:hidden">
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/50 z-[45]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45]"
             onClick={() => setIsMobileOpen(false)}
           />
           
           {/* Sidebar */}
-          <aside className="fixed inset-y-0 left-0 z-[50] w-64 bg-background border-r border-border shadow-xl">
+          <aside className="fixed inset-y-0 left-0 z-[50] w-64 bg-background/98 backdrop-blur-md border-r border-border shadow-2xl">
             <SidebarContent />
           </aside>
         </div>

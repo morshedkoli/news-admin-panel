@@ -156,10 +156,18 @@ export default function Settings() {
     try {
       setLoading(true);
       const response = await fetch('/api/settings');
-      if (response.ok) {
-        const data = await response.json();
-        setSettings(prev => ({ ...prev, ...data }));
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server did not return JSON');
+      }
+      
+      const data = await response.json();
+      setSettings(prev => ({ ...prev, ...data }));
     } catch (error) {
       console.error('Failed to load settings:', error);
     } finally {
@@ -196,30 +204,6 @@ export default function Settings() {
     if (section === 'appearance') {
       // Update appearance context immediately
       updateAppearance({ [key]: value });
-      
-      // Handle special cases for theme switching
-      if (key === 'enableDarkMode') {
-        // When dark mode toggle is changed, update the actual theme
-        const newTheme = value ? 'dark' : 'light';
-        updateAppearance({ theme: newTheme });
-        setSettings(prev => ({
-          ...prev,
-          [section]: {
-            ...prev[section],
-            [key]: value as boolean,
-            theme: newTheme,
-          },
-        }));
-        
-        // Save to localStorage immediately
-        try {
-          localStorage.setItem('theme', newTheme);
-          console.log('Theme saved via dark mode toggle:', newTheme);
-        } catch (error) {
-          console.error('Failed to save theme:', error);
-        }
-        return;
-      }
       
       // For theme dropdown changes, save immediately
       if (key === 'theme') {
@@ -361,6 +345,22 @@ export default function Settings() {
                     onChange={(e) => updateSetting('general', 'adminEmail', e.target.value)}
                     placeholder="admin@example.com"
                   />
+                </div>
+                <div className="pt-4 border-t">
+                  <Button 
+                    onClick={saveSettings} 
+                    disabled={saving}
+                    className="flex items-center gap-2 w-full"
+                  >
+                    {saving ? (
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                    ) : saved ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
+                    {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Site Information'}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -775,7 +775,7 @@ export default function Settings() {
                       <SelectItem value="auto">Auto (System)</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-sm text-gray-500 mt-1">Changes applied instantly</p>
+                  <p className="text-sm text-muted-foreground mt-1">Changes applied instantly</p>
                 </div>
                 
                 <div>
@@ -795,7 +795,7 @@ export default function Settings() {
                       className="flex-1"
                     />
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">Used for buttons, links, and highlights</p>
+                  <p className="text-sm text-muted-foreground mt-1">Used for buttons, links, and highlights</p>
                 </div>
 
                 <div>
@@ -815,20 +815,19 @@ export default function Settings() {
                       className="flex-1"
                     />
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">Used for success states and notifications</p>
+                  <p className="text-sm text-muted-foreground mt-1">Used for success states and notifications</p>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <Label>Dark Mode</Label>
-                    <p className="text-sm text-gray-500">Switch to dark theme interface</p>
+                    <p className="text-sm text-muted-foreground">Switch to dark theme interface</p>
                   </div>
                   <Switch
                     checked={settings.appearance.theme === 'dark'}
                     onCheckedChange={(checked) => {
                       const newTheme = checked ? 'dark' : 'light';
                       updateSetting('appearance', 'theme', newTheme);
-                      updateSetting('appearance', 'enableDarkMode', checked);
                     }}
                   />
                 </div>
@@ -856,7 +855,7 @@ export default function Settings() {
                     maxSize={2 * 1024 * 1024} // 2MB
                     description="Upload your logo (max 2MB)"
                   />
-                  <p className="text-sm text-gray-500 mt-1">Displayed in the header and login page</p>
+                  <p className="text-sm text-muted-foreground mt-1">Displayed in the header and login page</p>
                 </div>
 
                 <div>

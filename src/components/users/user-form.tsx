@@ -249,7 +249,7 @@ export function UserForm({ user, onSubmit, onCancel, loading = false }: UserForm
                   <SelectTrigger>
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-gray-200">
+                  <SelectContent>
                     <SelectItem value="ADMIN">
                       <div className="flex items-center gap-2">
                         <Badge className="bg-red-100 text-red-800">Admin</Badge>
@@ -281,7 +281,7 @@ export function UserForm({ user, onSubmit, onCancel, loading = false }: UserForm
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-gray-200">
+                  <SelectContent>
                     <SelectItem value="ACTIVE">
                       <Badge className="bg-green-100 text-green-800">Active</Badge>
                     </SelectItem>

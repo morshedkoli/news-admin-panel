@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { AppearanceProvider } from "@/contexts/AppearanceContext";
+import { TitleProvider } from "@/components/providers/title-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -109,7 +110,9 @@ export default function RootLayout({
       >
         <AppearanceProvider>
           <AuthProvider>
-            {children}
+            <TitleProvider>
+              {children}
+            </TitleProvider>
           </AuthProvider>
         </AppearanceProvider>
       </body>
