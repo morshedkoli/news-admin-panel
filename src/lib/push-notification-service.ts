@@ -200,20 +200,23 @@ class PushNotificationService {
   /**
    * Handle failed token deliveries
    */
-  private async handleFailedTokens(response: any, tokens: any[]) {
+  private async handleFailedTokens(response: { responses?: Array<{ success: boolean; error?: { code: string } }> }, tokens: Array<{ id: string; token: string; userId?: string; deviceId: string; platform: string; isActive: boolean }>) {
     if (!response.responses) return
 
     const failedTokens = response.responses
-      .map((resp: any, idx: number) => ({ response: resp, token: tokens[idx] }))
-      .filter(({ response }: any) => !response.success)
+      .map((resp: { success: boolean; error?: { code: string } }, idx: number) => ({ response: resp, token: tokens[idx] }))
+      .filter(({ response }: { response: { success: boolean; error?: { code: string } } }) => !response.success)
 
     for (const { response, token } of failedTokens) {
       if (response.error?.code === 'messaging/registration-token-not-registered' ||
           response.error?.code === 'messaging/invalid-registration-token') {
         // Mark token as inactive
         await dbService.createOrUpdateFCMToken({
-          ...token,
-          isActive: false
+          token: token.token,
+          deviceId: token.deviceId,
+          platform: token.platform,
+          isActive: false,
+          userId: token.userId
         })
       }
     }

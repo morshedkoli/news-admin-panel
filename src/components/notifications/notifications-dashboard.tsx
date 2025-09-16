@@ -138,11 +138,11 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      draft: { variant: 'secondary' as const, icon: Clock, color: 'text-gray-600' },
-      scheduled: { variant: 'outline' as const, icon: Calendar, color: 'text-blue-600' },
-      sent: { variant: 'default' as const, icon: CheckCircle, color: 'text-green-600' },
-      failed: { variant: 'destructive' as const, icon: XCircle, color: 'text-red-600' },
-      sending: { variant: 'outline' as const, icon: Send, color: 'text-yellow-600' }
+      draft: { variant: 'secondary' as const, icon: Clock, color: 'text-muted-foreground' },
+      scheduled: { variant: 'outline' as const, icon: Calendar, color: 'text-primary' },
+      sent: { variant: 'default' as const, icon: CheckCircle, color: 'text-emerald-600' },
+      failed: { variant: 'destructive' as const, icon: XCircle, color: 'text-destructive' },
+      sending: { variant: 'outline' as const, icon: Send, color: 'text-amber-600' }
     }
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft
@@ -158,10 +158,10 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
 
   const getTypeColor = (type: string) => {
     const colors = {
-      general: 'bg-blue-100 text-blue-800',
-      news: 'bg-green-100 text-green-800',
-      promotion: 'bg-purple-100 text-purple-800',
-      alert: 'bg-red-100 text-red-800'
+      general: 'bg-primary/10 text-primary',
+      news: 'bg-emerald-500/10 text-emerald-600',
+      promotion: 'bg-violet-500/10 text-violet-600',
+      alert: 'bg-rose-500/10 text-rose-600'
     }
     return colors[type as keyof typeof colors] || colors.general
   }
@@ -179,8 +179,8 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
             <Card key={i}>
               <CardContent className="p-6">
                 <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-8 bg-muted rounded w-1/2"></div>
                 </div>
               </CardContent>
             </Card>
@@ -199,10 +199,10 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Subscribers</p>
-                  <p className="text-2xl font-bold">{tokenStats.totalTokens.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Total Subscribers</p>
+                  <p className="text-2xl font-bold text-foreground">{tokenStats.totalTokens.toLocaleString()}</p>
                 </div>
-                <Users className="h-8 w-8 text-blue-600" />
+                <Users className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -211,10 +211,10 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Active Devices</p>
-                  <p className="text-2xl font-bold">{tokenStats.activeTokens.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Active Devices</p>
+                  <p className="text-2xl font-bold text-foreground">{tokenStats.activeTokens.toLocaleString()}</p>
                 </div>
-                <Smartphone className="h-8 w-8 text-green-600" />
+                <Smartphone className="h-8 w-8 text-emerald-600" />
               </div>
             </CardContent>
           </Card>
@@ -223,11 +223,11 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Android Users</p>
-                  <p className="text-2xl font-bold">{tokenStats.androidTokens.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Android Users</p>
+                  <p className="text-2xl font-bold text-foreground">{tokenStats.androidTokens.toLocaleString()}</p>
                 </div>
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-green-600 font-bold text-sm">A</span>
+                <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center">
+                  <span className="text-emerald-600 font-bold text-sm">A</span>
                 </div>
               </div>
             </CardContent>
@@ -237,11 +237,11 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">iOS Users</p>
-                  <p className="text-2xl font-bold">{tokenStats.iosTokens.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-muted-foreground">iOS Users</p>
+                  <p className="text-2xl font-bold text-foreground">{tokenStats.iosTokens.toLocaleString()}</p>
                 </div>
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-bold text-sm">i</span>
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <span className="text-primary font-bold text-sm">i</span>
                 </div>
               </div>
             </CardContent>
@@ -271,37 +271,37 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   placeholder="Search notifications..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white"
+                  className="pl-10"
                 />
               </div>
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40 bg-white">
+              <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200">
-                <SelectItem value="all" className="bg-white hover:bg-gray-50">All Status</SelectItem>
-                <SelectItem value="draft" className="bg-white hover:bg-gray-50">Draft</SelectItem>
-                <SelectItem value="scheduled" className="bg-white hover:bg-gray-50">Scheduled</SelectItem>
-                <SelectItem value="sent" className="bg-white hover:bg-gray-50">Sent</SelectItem>
-                <SelectItem value="failed" className="bg-white hover:bg-gray-50">Failed</SelectItem>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="sent">Sent</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
               </SelectContent>
             </Select>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-40 bg-white">
+              <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200">
-                <SelectItem value="all" className="bg-white hover:bg-gray-50">All Types</SelectItem>
-                <SelectItem value="general" className="bg-white hover:bg-gray-50">General</SelectItem>
-                <SelectItem value="news" className="bg-white hover:bg-gray-50">News</SelectItem>
-                <SelectItem value="promotion" className="bg-white hover:bg-gray-50">Promotion</SelectItem>
-                <SelectItem value="alert" className="bg-white hover:bg-gray-50">Alert</SelectItem>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="general">General</SelectItem>
+                <SelectItem value="news">News</SelectItem>
+                <SelectItem value="promotion">Promotion</SelectItem>
+                <SelectItem value="alert">Alert</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -309,7 +309,7 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
           {/* Notifications List */}
           <div className="space-y-4">
             {filteredNotifications.length > 0 ? filteredNotifications.map((notification) => (
-              <div key={notification.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div key={notification.id} className="border border-border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
@@ -318,22 +318,22 @@ export function NotificationsDashboard({ onCreateNew }: NotificationsDashboardPr
                         {notification.type}
                       </Badge>
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{notification.title}</h3>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{notification.body}</p>
+                    <h3 className="font-semibold text-foreground mb-1">{notification.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{notification.body}</p>
                     
                     {/* Stats */}
                     {notification.stats.totalDeliveries > 0 && (
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Users className="h-3 w-3" />
                           {notification.stats.totalDeliveries} sent
                         </span>
                         <span className="flex items-center gap-1">
-                          <CheckCircle className="h-3 w-3 text-green-600" />
+                          <CheckCircle className="h-3 w-3 text-emerald-600" />
                           {notification.stats.deliveryRate}% delivered
                         </span>
                         <span className="flex items-center gap-1">
-                          <Eye className="h-3 w-3 text-blue-600" />
+                          <Eye className="h-3 w-3 text-primary" />
                           {notification.stats.clickRate}% clicked
                         </span>
                       </div>

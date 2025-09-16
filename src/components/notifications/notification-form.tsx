@@ -273,7 +273,6 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
               onChange={(e) => handleInputChange('title', e.target.value)}
               placeholder="Enter notification title"
               maxLength={50}
-              className="bg-white"
             />
             <p className="text-xs text-gray-500 mt-1">{formData.title.length}/50 characters</p>
           </div>
@@ -287,7 +286,6 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
               placeholder="Enter notification message"
               rows={3}
               maxLength={200}
-              className="bg-white"
             />
             <p className="text-xs text-gray-500 mt-1">{formData.body.length}/200 characters</p>
           </div>
@@ -299,7 +297,6 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
               value={formData.imageUrl}
               onChange={(e) => handleInputChange('imageUrl', e.target.value)}
               placeholder="https://example.com/image.jpg"
-              className="bg-white"
             />
           </div>
         </div>
@@ -308,14 +305,14 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
         <div>
           <Label>Notification Type</Label>
           <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
-            <SelectTrigger className="bg-white">
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-200">
-              <SelectItem value="general" className="bg-white hover:bg-gray-50">General</SelectItem>
-              <SelectItem value="news" className="bg-white hover:bg-gray-50">News Update</SelectItem>
-              <SelectItem value="promotion" className="bg-white hover:bg-gray-50">Promotion</SelectItem>
-              <SelectItem value="alert" className="bg-white hover:bg-gray-50">Alert</SelectItem>
+            <SelectContent>
+              <SelectItem value="general">General</SelectItem>
+              <SelectItem value="news">News Update</SelectItem>
+              <SelectItem value="promotion">Promotion</SelectItem>
+              <SelectItem value="alert">Alert</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -325,12 +322,12 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
           <div>
             <Label>Link to Article (Optional)</Label>
             <Select value={formData.newsId} onValueChange={(value) => handleInputChange('newsId', value)}>
-              <SelectTrigger className="bg-white">
+              <SelectTrigger>
                 <SelectValue placeholder="Select an article" />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200">
+              <SelectContent>
                 {newsArticles.map((article) => (
-                  <SelectItem key={article.id} value={article.id} className="bg-white hover:bg-gray-50">
+                  <SelectItem key={article.id} value={article.id}>
                     <div className="flex flex-col">
                       <span className="font-medium">{article.title}</span>
                       <span className="text-xs text-gray-500">{article.category.name}</span>
@@ -350,17 +347,17 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
           </Label>
           
           <Select value={formData.targetType} onValueChange={(value) => handleInputChange('targetType', value)}>
-            <SelectTrigger className="bg-white">
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-200">
-              <SelectItem value="all" className="bg-white hover:bg-gray-50">
+            <SelectContent>
+              <SelectItem value="all">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   All Subscribers
                 </div>
               </SelectItem>
-              <SelectItem value="category" className="bg-white hover:bg-gray-50">
+              <SelectItem value="category">
                 <div className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
                   By Category Interest
@@ -371,12 +368,12 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
 
           {formData.targetType === 'category' && (
             <Select value={formData.targetValue} onValueChange={(value) => handleInputChange('targetValue', value)}>
-              <SelectTrigger className="bg-white">
+              <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200">
+              <SelectContent>
                 {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id} className="bg-white hover:bg-gray-50">
+                  <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
                 ))}
@@ -406,7 +403,6 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
                 value={formData.scheduledAt}
                 onChange={(e) => handleInputChange('scheduledAt', e.target.value)}
                 min={new Date().toISOString().slice(0, 16)}
-                className="bg-white"
               />
             </div>
           )}
@@ -417,7 +413,7 @@ export function NotificationForm({ onSuccess, onCancel }: NotificationFormProps)
           <Button
             onClick={() => setPreviewMode(true)}
             variant="outline"
-            className="flex-1 bg-white"
+            className="flex-1"
             disabled={!formData.title.trim() || !formData.body.trim()}
           >
             <ImageIcon className="h-4 w-4 mr-2" />

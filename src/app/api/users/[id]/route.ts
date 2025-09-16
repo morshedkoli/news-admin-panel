@@ -20,7 +20,7 @@ export async function GET(
     }
 
     // Remove password from response and add mock data
-    const { password: _, ...safeUser } = user
+    const { password: _pwd, ...safeUser } = user
     const mockUserData = {
       ...safeUser,
       userSessions: [],

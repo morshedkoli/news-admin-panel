@@ -421,12 +421,18 @@ class DatabaseService {
   async createNotification(notificationData: Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>): Promise<Notification> {
     const id = createDocumentId();
     const now = new Date();
+    
+    // Filter out undefined values to prevent Firestore errors
+    const cleanedData = Object.fromEntries(
+      Object.entries(notificationData).filter(([_, value]) => value !== undefined)
+    );
+    
     const notification: Notification = {
-      ...notificationData,
+      ...cleanedData,
       id,
       createdAt: now,
       updatedAt: now,
-    };
+    } as Notification;
     
     await db.collection(COLLECTIONS.NOTIFICATIONS).doc(id).set(notification);
     return notification;
